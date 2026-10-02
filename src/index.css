@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@variant dark (&:is(.dark *));
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen font-sans bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100;
+  }
+}
