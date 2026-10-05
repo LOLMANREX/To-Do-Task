@@ -215,7 +215,7 @@ export default function App() {
                       <span className={t.dueDate < todayStr && t.status !== 'done' ? 'text-red-500 font-bold' : ''}>
                         📅 {t.dueDate}
                       </span>
-                      {t.completedAt && <span>✅ Fait le {t.completedAt.split('T')[0]}</span>}
+                      {t.completedAt && <span> Fait le {t.completedAt.split('T')[0]}</span>}
                     </div>
                   </div>
 

@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Calendar, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function DashboardLayout() {
@@ -14,6 +14,7 @@ export default function DashboardLayout() {
     const navItems = [
         { path: '/dashboard', icon: LayoutDashboard, label: 'Accueil' },
         { path: '/tasks', icon: CheckSquare, label: 'Tâches' },
+        { path: '/agenda', icon: Calendar, label: 'Agenda' },
         { path: '/settings', icon: Settings, label: 'Paramètres' }
     ]
 

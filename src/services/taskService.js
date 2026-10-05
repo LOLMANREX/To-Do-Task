@@ -5,7 +5,7 @@ export const taskService = {
         return await db.tasks.where('userId').equals(userId).toArray()
     },
 
-    async createTask({ userId, name, description, dueDate }) {
+    async createTask({ userId, name, description, dueDate, dueTime = '' }) {
         const now = new Date().toISOString()
         const newTask = {
             id: crypto.randomUUID(),
@@ -14,6 +14,7 @@ export const taskService = {
             description: description ? description.trim() : '',
             status: 'todo',
             dueDate,
+            dueTime,
             createdAt: now,
             updatedAt: now,
             completedAt: null,
@@ -36,12 +37,13 @@ export const taskService = {
         return await db.tasks.get(taskId)
     },
 
-    async updateTask(taskId, { name, description, dueDate, status }) {
+    async updateTask(taskId, { name, description, dueDate, dueTime = '', status }) {
         const now = new Date().toISOString()
         const updates = {
             name: name.trim(),
             description: description ? description.trim() : '',
             dueDate,
+            dueTime,
             status,
             updatedAt: now,
             completedAt: status === 'done' ? now : null
