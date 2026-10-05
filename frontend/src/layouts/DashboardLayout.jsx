@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Calendar, Settings, LogOut, Monitor, Smartphone, Sun, Moon } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Calendar, Settings, LogOut, Monitor, Smartphone, Sun, Moon, Sparkles, Droplets } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -7,7 +7,7 @@ import { Avatar } from '@/components/Avatar'
 
 export default function DashboardLayout() {
     const { user, logout } = useAuth()
-    const { mode, toggleTheme } = useTheme()
+    const { mode, setMode, toggleTheme, isGlass } = useTheme()
     const { viewMode, setViewMode, toggleViewMode, isMobile } = useViewMode()
     const navigate = useNavigate()
 
@@ -28,6 +28,14 @@ export default function DashboardLayout() {
     if (isMobile) {
         return (
             <div className="min-h-[100dvh] w-full bg-zinc-100 dark:bg-zinc-900/50 flex flex-col items-center justify-center p-0 sm:p-6 lg:p-8 relative font-sans text-zinc-900 dark:text-zinc-100 overflow-hidden transition-colors duration-300">
+                {isGlass && (
+                    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+                        <div className={`absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full blur-[100px] opacity-70 animate-liquid-1 ${mode === 'glass-dark' ? 'bg-indigo-600/35' : 'bg-sky-300/50'}`} />
+                        <div className={`absolute top-1/3 -right-32 w-[550px] h-[550px] rounded-full blur-[110px] opacity-60 animate-liquid-2 ${mode === 'glass-dark' ? 'bg-fuchsia-600/30' : 'bg-pink-300/45'}`} />
+                        <div className={`absolute -bottom-32 left-1/4 w-[600px] h-[600px] rounded-full blur-[120px] opacity-60 animate-liquid-1 ${mode === 'glass-dark' ? 'bg-teal-500/30' : 'bg-amber-200/45'}`} />
+                    </div>
+                )}
+
                 <div className="absolute top-6 right-6 z-50 hidden sm:flex items-center p-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm">
                     <button
                         type="button"
@@ -44,7 +52,7 @@ export default function DashboardLayout() {
                     </button>
                 </div>
 
-                <div className="relative w-full sm:w-[393px] h-[100dvh] sm:h-[852px] sm:max-h-[90vh] bg-white sm:bg-zinc-950 dark:bg-zinc-950 sm:rounded-[48px] sm:shadow-2xl sm:p-[8px] flex shrink-0 sm:ring-1 sm:ring-zinc-900/5 dark:sm:ring-white/10 transition-colors duration-300">
+                <div className="relative w-full sm:w-[393px] h-[100dvh] sm:h-[852px] sm:max-h-[90vh] bg-white sm:bg-zinc-950 dark:bg-zinc-950 sm:rounded-[48px] sm:shadow-2xl sm:p-[8px] flex shrink-0 sm:ring-1 sm:ring-zinc-900/5 dark:sm:ring-white/10 transition-colors duration-300 z-10">
                     <div className="relative w-full h-full bg-zinc-50 dark:bg-zinc-950 sm:rounded-[40px] overflow-hidden flex flex-col shadow-inner transition-colors duration-300">
                         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-zinc-950 rounded-full z-50 hidden sm:flex items-center justify-between px-3">
                             <div className="w-2 h-2 rounded-full bg-zinc-800/50"></div>
@@ -63,7 +71,10 @@ export default function DashboardLayout() {
                                     title="Changer de thème"
                                     className="p-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
                                 >
-                                    {mode === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+                                    {mode === 'glass-dark' && <Droplets className="w-5 h-5 text-indigo-400" />}
+                                    {mode === 'glass-light' && <Sparkles className="w-5 h-5 text-blue-500" />}
+                                    {mode === 'dark' && <Moon className="w-5 h-5 text-zinc-200" />}
+                                    {mode === 'light' && <Sun className="w-5 h-5 text-amber-500" />}
                                 </button>
                                 <button
                                     type="button"
@@ -110,8 +121,16 @@ export default function DashboardLayout() {
     }
 
     return (
-        <div className="flex h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300">
-            <aside className="w-64 border-r border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex flex-col justify-between shrink-0 transition-colors duration-300">
+        <div className="flex h-screen w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300 relative overflow-hidden">
+            {isGlass && (
+                <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+                    <div className={`absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full blur-[110px] opacity-70 animate-liquid-1 ${mode === 'glass-dark' ? 'bg-indigo-600/35' : 'bg-sky-300/50'}`} />
+                    <div className={`absolute top-1/4 -right-32 w-[650px] h-[650px] rounded-full blur-[120px] opacity-60 animate-liquid-2 ${mode === 'glass-dark' ? 'bg-purple-600/30' : 'bg-pink-300/45'}`} />
+                    <div className={`absolute -bottom-32 left-1/3 w-[700px] h-[700px] rounded-full blur-[130px] opacity-60 animate-liquid-1 ${mode === 'glass-dark' ? 'bg-teal-500/30' : 'bg-amber-200/45'}`} />
+                </div>
+            )}
+
+            <aside className="w-64 border-r border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex flex-col justify-between shrink-0 transition-colors duration-300 relative z-10">
                 <div>
                     <div className="h-14 flex items-center justify-between px-5 border-b border-zinc-200 dark:border-zinc-900">
                         <span className="font-semibold text-sm tracking-tight">To-Do Task</span>
@@ -146,16 +165,46 @@ export default function DashboardLayout() {
 
                 <div className="p-3 border-t border-zinc-200 dark:border-zinc-900 space-y-3">
                     <div className="bg-zinc-50 dark:bg-zinc-900/50 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
-                        <div className="flex items-center justify-between mb-2 px-1">
-                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Affichage</span>
+                        <div className="flex items-center justify-between mb-1.5 px-1">
+                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Thème</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-200/50 dark:bg-zinc-950 p-1 rounded-lg mb-2.5">
                             <button
                                 type="button"
-                                onClick={toggleTheme}
-                                className="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                                title={mode === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+                                onClick={() => setMode('light')}
+                                title="Clair"
+                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'light' ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
                             >
-                                {mode === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-zinc-600" />}
+                                <Sun className="w-3.5 h-3.5" />
                             </button>
+                            <button
+                                type="button"
+                                onClick={() => setMode('dark')}
+                                title="Sombre"
+                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'dark' ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
+                            >
+                                <Moon className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMode('glass-light')}
+                                title="Liquid Glass Clair"
+                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-light' ? 'bg-white text-sky-600 shadow-sm border border-sky-200 ring-1 ring-sky-400/40' : 'text-zinc-500 hover:text-sky-600 dark:text-zinc-400'}`}
+                            >
+                                <Sparkles className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMode('glass-dark')}
+                                title="Liquid Glass Sombre"
+                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-dark' ? 'bg-zinc-800 text-indigo-400 shadow-sm border border-indigo-500/50 ring-1 ring-indigo-500/40' : 'text-zinc-500 hover:text-indigo-400 dark:text-zinc-400'}`}
+                            >
+                                <Droplets className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-1.5 px-1">
+                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Affichage</span>
                         </div>
                         <div className="flex items-center bg-zinc-200/50 dark:bg-zinc-950 p-1 rounded-lg">
                             <button
@@ -200,7 +249,7 @@ export default function DashboardLayout() {
                 </div>
             </aside>
 
-            <main className="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+            <main className="flex-1 flex flex-col h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 relative z-10">
                 <div className="flex-1 overflow-y-auto p-8 lg:p-12">
                     <Outlet />
                 </div>

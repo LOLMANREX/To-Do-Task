@@ -42,10 +42,15 @@
 - **Photo personnalisée** : Téléversement de sa propre image de profil (JPG, PNG, WEBP, GIF jusqu'à 5 Mo).
 - **Réinitialisation en un clic** : Retour instantané à l'avatar par défaut.
 
-### 🎨 6. Thème Dynamique avec Animations Fluides
-- **Modes Clair & Sombre** : Palette soigneusement contrastée respectant les standards du design brutal-minimaliste.
-- **Animations Cinématiques** : Exploitation de l'API moderne `document.startViewTransition` et de transitions CSS cubiques (`cubic-bezier(0.16, 1, 0.3, 1)`).
-- **Bascule rapide** : Bouton direct Soleil / Lune dans la barre latérale et commandes complètes dans les paramètres.
+### 🎨 6. Galerie de Thèmes Exclusifs & Système Liquid Glass
+- **4 Thèmes Distincts Intégrés** :
+  - ☀️ **Minimaliste Clair** : Design brutal-minimaliste épuré avec contrastes nets et fond immaculé.
+  - 🌙 **Minimaliste Sombre** : Noir profond et ergonomie nocturne réduisant la fatigue visuelle.
+  - 💧 **Liquid Glass Clair** : Édition opalescente en verre liquide haute réfraction, reflets prismatiques doux et maillage boréal iridescent.
+  - 🌌 **Liquid Glass Sombre** : Édition obsidienne cryogénique en verre fumé, transparence optique et néons bioluminescents profonds (indigo/violet/teal).
+- **Moteur de Réfraction & Orbes Ambiants** : Filtres optiques avancés (`backdrop-filter: blur(32px) saturate(200%)`), biseaux spéculaires et halo de caustiques lumineuses animées en arrière-plan.
+- **Animations Cinématiques** : Exploitation de l'API moderne `document.startViewTransition` couplée à des transitions CSS fluides (`cubic-bezier(0.16, 1, 0.3, 1)`).
+- **Sélecteur Segmenté Direct** : Contrôle 4-en-1 accessible dans la barre latérale pour basculer en un clic et galerie visuelle détaillée dans les Paramètres.
 
 ### 📱 7. Simulateur Multi-Device
 - **Mode Bureau** : Barre latérale rétractable avec navigation complète et profil utilisateur en pied de page.

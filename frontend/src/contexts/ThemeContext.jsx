@@ -8,8 +8,19 @@ export function ThemeProvider({ children }) {
     const applyTheme = (newMode) => {
         const root = window.document.documentElement
         root.classList.add('theme-transitioning')
-        root.classList.remove('light', 'dark')
-        root.classList.add(newMode)
+        
+        root.classList.remove('light', 'dark', 'glass-light', 'glass-dark')
+
+        if (newMode === 'glass-light') {
+            root.classList.add('light', 'glass-light')
+        } else if (newMode === 'glass-dark') {
+            root.classList.add('dark', 'glass-dark')
+        } else if (newMode === 'dark') {
+            root.classList.add('dark')
+        } else {
+            root.classList.add('light')
+        }
+
         localStorage.setItem('todo_mode', newMode)
         setTimeout(() => {
             root.classList.remove('theme-transitioning')
@@ -30,17 +41,21 @@ export function ThemeProvider({ children }) {
     }
 
     const toggleTheme = () => {
-        setMode(mode === 'light' ? 'dark' : 'light')
+        const sequence = ['light', 'dark', 'glass-light', 'glass-dark']
+        const currentIndex = sequence.indexOf(mode)
+        const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % sequence.length
+        setMode(sequence[nextIndex])
     }
 
     useEffect(() => {
-        const root = window.document.documentElement
-        root.classList.remove('light', 'dark')
-        root.classList.add(mode)
+        applyTheme(mode)
     }, [])
 
+    const isGlass = mode === 'glass-light' || mode === 'glass-dark'
+    const isDark = mode === 'dark' || mode === 'glass-dark'
+
     return (
-        <ThemeContext.Provider value={{ mode, setMode, toggleTheme, isGlass: false }}>
+        <ThemeContext.Provider value={{ mode, setMode, toggleTheme, isGlass, isDark }}>
             {children}
         </ThemeContext.Provider>
     )

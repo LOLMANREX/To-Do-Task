@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Monitor, Smartphone, Sun, Moon, Upload, RotateCcw, Check, User as UserIcon } from 'lucide-react'
+import { Monitor, Smartphone, Sun, Moon, Upload, RotateCcw, Check, User as UserIcon, Sparkles, Droplets } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -273,29 +273,122 @@ export default function Settings() {
                 <hr className="border-zinc-200 dark:border-zinc-900" />
 
                 <section className="space-y-4">
-                    <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Apparence</h2>
-                    <div className="flex items-center gap-3">
+                    <div>
+                        <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Thèmes & Ambiances</h2>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Sélectionnez l'univers visuel et le niveau de réfraction de l'interface.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button
                             type="button"
                             onClick={() => setMode('light')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border transition-all cursor-pointer ${mode === 'light'
-                                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
-                                    : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
-                                }`}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'light' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
                         >
-                            <Sun className="w-4 h-4 text-amber-500" />
-                            Mode Clair
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="h-8 w-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                                    <Sun className="w-4 h-4" />
+                                </div>
+                                {mode === 'light' && (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+                                        <Check className="w-3 h-3" /> Actif
+                                    </span>
+                                )}
+                            </div>
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Clair</h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                                Style SaaS brutal-minimaliste épuré avec contrastes nets et fond immaculé.
+                            </p>
+                            <div className="mt-3 p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-300">
+                                <span>Contraste élevé</span>
+                                <span className="font-mono">#FFFFFF</span>
+                            </div>
                         </button>
+
                         <button
                             type="button"
                             onClick={() => setMode('dark')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border transition-all cursor-pointer ${mode === 'dark'
-                                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
-                                    : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
-                                }`}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'dark' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
                         >
-                            <Moon className="w-4 h-4 text-blue-400" />
-                            Mode Sombre
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="h-8 w-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                                    <Moon className="w-4 h-4" />
+                                </div>
+                                {mode === 'dark' && (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+                                        <Check className="w-3 h-3" /> Actif
+                                    </span>
+                                )}
+                            </div>
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Sombre</h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                                Noir profond et élégance nocturne réduisant la fatigue visuelle.
+                            </p>
+                            <div className="mt-3 p-2 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400">
+                                <span>Nocturne pur</span>
+                                <span className="font-mono">#09090B</span>
+                            </div>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setMode('glass-light')}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'glass-light' ? 'border-sky-400 ring-2 ring-sky-400/30 bg-white/80 shadow-lg' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-sky-300'}`}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-400/20 to-pink-400/20 border border-sky-400/30 flex items-center justify-center text-sky-500 shadow-inner">
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                                        Liquid Glass
+                                    </span>
+                                    {mode === 'glass-light' && (
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-600 text-white shadow-sm">
+                                            <Check className="w-3 h-3" /> Actif
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Liquid Glass Clair</h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                                Verre opalescent givré, maillage boréal iridescent et reflets prismatiques doux.
+                            </p>
+                            <div className="mt-3 p-2 rounded-lg bg-gradient-to-r from-sky-100/80 via-pink-100/60 to-amber-100/80 border border-white/80 backdrop-blur-md flex items-center justify-between text-[11px] text-slate-700 font-medium">
+                                <span>Réfraction opalescente</span>
+                                <span>Aurore Boréale</span>
+                            </div>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setMode('glass-dark')}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'glass-dark' ? 'border-indigo-400 ring-2 ring-indigo-400/30 bg-zinc-900/90 shadow-lg' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-indigo-400/50'}`}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-inner">
+                                    <Droplets className="w-4 h-4" />
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-800">
+                                        Liquid Glass
+                                    </span>
+                                    {mode === 'glass-dark' && (
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-600 text-white shadow-sm">
+                                            <Check className="w-3 h-3" /> Actif
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Liquid Glass Sombre</h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                                Obsidienne liquide, verre fumé cryogénique et néons bioluminescents profonds.
+                            </p>
+                            <div className="mt-3 p-2 rounded-lg bg-gradient-to-r from-indigo-950/90 via-purple-950/70 to-teal-950/80 border border-white/10 backdrop-blur-md flex items-center justify-between text-[11px] text-indigo-200 font-medium">
+                                <span>Obsidienne plasma</span>
+                                <span>Bioluminescent</span>
+                            </div>
                         </button>
                     </div>
                 </section>
