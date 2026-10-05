@@ -1,7 +1,7 @@
 .env
-__pycache__/
-*.pyc
+*.local
 node_modules/
-.gemini-cli-env/
-build/
-.dart_tool/
+dist/
+uploads/*
+!uploads/.gitkeep
+.DS_Store

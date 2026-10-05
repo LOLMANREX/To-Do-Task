@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { taskService } from '@/services/taskService'
 import { CheckCircle2, Clock, ListTodo, TrendingUp } from 'lucide-react'
+import { Avatar } from '@/components/Avatar'
 
 export default function Home() {
     const { user } = useAuth()
@@ -30,7 +31,8 @@ export default function Home() {
     const inProgress = tasks.filter(t => t.status === 'in_progress').length
     const completionRate = total === 0 ? 0 : Math.round((completed / total) * 100)
 
-    // Classes conditionnelles
+    const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.pseudo || user?.email?.split('@')[0] || 'Utilisateur'
+
     const cardBase = "p-5 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02]"
     const cardGlass = "bg-white/40 dark:bg-black/20 backdrop-blur-2xl backdrop-saturate-150 border border-white/50 dark:border-white/10 shadow-xl hover:bg-white/50 dark:hover:bg-black/30"
     const cardSolid = "bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 shadow-sm hover:border-slate-300 dark:hover:border-zinc-700"
@@ -39,13 +41,16 @@ export default function Home() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className={`text-4xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50 ${isGlass ? 'drop-shadow-sm' : ''}`}>
-                    Bonjour, {user?.firstName} 👋
-                </h1>
-                <p className={`mt-2 font-medium ${isGlass ? 'text-slate-700 dark:text-zinc-300 drop-shadow-sm' : 'text-slate-500 dark:text-zinc-400'}`}>
-                    Voici un résumé de votre productivité aujourd'hui.
-                </p>
+            <div className="flex items-center gap-4">
+                <Avatar user={user} size="xl" />
+                <div>
+                    <h1 className={`text-4xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50 ${isGlass ? 'drop-shadow-sm' : ''}`}>
+                        Bonjour, {displayName} 👋
+                    </h1>
+                    <p className={`mt-1 font-medium ${isGlass ? 'text-slate-700 dark:text-zinc-300 drop-shadow-sm' : 'text-slate-500 dark:text-zinc-400'}`}>
+                        Voici un résumé de votre productivité aujourd'hui.
+                    </p>
+                </div>
             </div>
 
             {loading ? (

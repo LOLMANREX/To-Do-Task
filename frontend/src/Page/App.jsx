@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { taskService } from '@/services/taskService'
+import { FileText, Download, X } from 'lucide-react'
 
 export default function App() {
   const { user } = useAuth()
@@ -14,8 +15,40 @@ export default function App() {
   const [priority, setPriority] = useState('medium')
   const [formError, setFormError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [attachment, setAttachment] = useState(null)
+  const [attachmentName, setAttachmentName] = useState(null)
 
   const todayStr = new Date().toISOString().split('T')[0]
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) {
+      setAttachment(null)
+      setAttachmentName(null)
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFormError('Le fichier dépasse 2 Mo.')
+      setAttachment(null)
+      setAttachmentName(null)
+      e.target.value = ''
+      return
+    }
+    setFormError('')
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setAttachment(reader.result)
+      setAttachmentName(file.name)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleRemoveFile = () => {
+    setAttachment(null)
+    setAttachmentName(null)
+    const fileInput = document.getElementById('file-upload')
+    if (fileInput) fileInput.value = ''
+  }
 
   useEffect(() => {
     async function chargerTaches() {
@@ -56,7 +89,9 @@ export default function App() {
         userId: user.id,
         name: nomNettoye,
         description,
-        dueDate
+        dueDate,
+        attachment,
+        attachmentName
       })
       nouvelleTache.priority = priority
       setTasks((prev) => [nouvelleTache, ...prev])
@@ -64,6 +99,10 @@ export default function App() {
       setDescription('')
       setDueDate('')
       setPriority('medium')
+      setAttachment(null)
+      setAttachmentName(null)
+      const fileInput = document.getElementById('file-upload')
+      if (fileInput) fileInput.value = ''
     } catch (err) {
       setFormError(err.message)
     } finally {
@@ -150,6 +189,24 @@ export default function App() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600 dark:text-zinc-400">Pièce jointe</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*,application/pdf"
+                    onChange={handleFileChange}
+                    className="flex-1 h-9 text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-slate-200 dark:file:bg-zinc-800 file:text-slate-900 dark:file:text-zinc-100 hover:file:bg-slate-300 dark:hover:file:bg-zinc-700 transition cursor-pointer border border-zinc-200 dark:border-zinc-800 rounded-lg"
+                  />
+                  {attachmentName && (
+                    <button type="button" onClick={handleRemoveFile} className="h-9 px-2.5 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition cursor-pointer flex items-center justify-center shrink-0">
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -217,6 +274,21 @@ export default function App() {
                       </span>
                       {t.completedAt && <span> Fait le {t.completedAt.split('T')[0]}</span>}
                     </div>
+                    {t.attachment && (
+                      <div className="pt-2">
+                        {t.attachment.startsWith('data:image') ? (
+                          <a href={t.attachment} download={t.attachmentName} className="inline-block transition-transform hover:scale-105">
+                            <img src={t.attachment} alt={t.attachmentName} className="w-12 h-12 object-cover rounded-md border border-slate-200 dark:border-zinc-700 shadow-sm" />
+                          </a>
+                        ) : (
+                          <a href={t.attachment} download={t.attachmentName} className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-zinc-800 rounded-md border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700 transition shadow-sm text-slate-700 dark:text-zinc-300">
+                            <FileText size={14} />
+                            <span className="truncate max-w-[120px] text-xs font-medium">{t.attachmentName}</span>
+                            <Download size={14} className="ml-1 opacity-70" />
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">

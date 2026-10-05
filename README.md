@@ -1,16 +1,42 @@
-# React + Vite
+# To-Do Task
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application SaaS To-Do List brutal-minimaliste transformée en architecture fullstack conteneurisée.
 
-Currently, two official plugins are available:
+## Stack Technique
+- **Frontend** : React 19, Vite, Tailwind CSS v4, Lucide Icons
+- **Backend** : Node.js, Express, MySQL2, JWT (cookies httpOnly), Multer, Bcrypt
+- **Base de données** : MySQL 8.4 avec persistance sur volume Docker
+- **Reverse Proxy** : Nginx (port 80)
+- **Administration DB** : phpMyAdmin (port 8080)
+- **Orchestration** : Docker Compose
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Démarrage Rapide
 
-## React Compiler
+1. Cloner le dépôt :
+```bash
+git clone https://github.com/LOLMANREX/To-Do-Task.git
+cd To-Do-Task
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Configurer les variables d'environnement :
+```bash
+cp .env.example .env
+```
 
-## Expanding the ESLint configuration
+3. Lancer l'ensemble des conteneurs :
+```bash
+docker compose up --build
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+L'application sera accessible sur :
+- **Application Web** : http://localhost
+- **API Backend** : http://localhost/api
+- **phpMyAdmin** : http://localhost:8080
+
+## Fonctionnalités
+- Authentification sécurisée par JWT dans cookie httpOnly (Inscription, Connexion, Session)
+- Gestion complète des tâches (création, mise à jour, suppression, filtrage, dates d'échéance)
+- Téléversement de pièces jointes (documents jusqu'à 5 Mo)
+- Système de photo de profil avec galerie d'avatars par défaut et upload personnalisé
+- Animation fluide du changement de thème (Clair / Sombre) via View Transitions
+- Mode d'affichage adaptatif (Bureau et Mobile)
