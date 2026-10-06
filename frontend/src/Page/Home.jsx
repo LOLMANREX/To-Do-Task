@@ -34,7 +34,7 @@ export default function Home() {
     const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.pseudo || user?.email?.split('@')[0] || 'Utilisateur'
 
     const cardBase = "p-5 rounded-2xl flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
-    const cardGlass = "bg-white/50 dark:bg-zinc-900/40 backdrop-blur-2xl backdrop-saturate-180 border border-white/60 dark:border-white/10 shadow-xl shadow-slate-900/5 dark:shadow-black/40 hover:bg-white/65 dark:hover:bg-zinc-900/50"
+    const cardGlass = "bg-white/60 dark:bg-zinc-900/60 backdrop-blur-3xl backdrop-saturate-200 border border-white/80 dark:border-white/15 shadow-[0_16px_40px_-12px_rgba(15,23,42,0.08)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.7)] hover:border-white dark:hover:border-white/30 hover:shadow-[0_20px_50px_-10px_rgba(14,165,233,0.15)] dark:hover:shadow-[0_24px_60px_-12px_rgba(99,102,241,0.25)]"
     const cardSolid = "bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 shadow-sm hover:border-slate-300 dark:hover:border-zinc-700"
 
     const currentCardClass = `${cardBase} ${isGlass ? cardGlass : cardSolid}`

@@ -27,9 +27,10 @@
 - **Détection des retards** : Mise en évidence visuelle des tâches en retard par rapport à la date du jour.
 
 ### 📎 3. Documents & Pièces Jointes
-- **Upload de fichiers** : Prise en charge des pièces jointes jusqu'à **5 Mo** par tâche via Multer.
-- **Stockage dédié** : Conservation des fichiers sur un volume Docker interne monté et sécurisé.
-- **Téléchargement** : Accès direct et téléchargement des documents associés aux tâches.
+- **Upload persistant** : Prise en charge des pièces jointes jusqu'à **5 Mo** par tâche via Multer (images, PDF, documents).
+- **Stockage dédié & base de données** : Conservation des fichiers sur le volume Docker interne sécurisé `/app/uploads` et liaison SQL avec nom d'origine et type MIME.
+- **Consultation & Téléchargement** : Visualisation directe en un clic (miniature d'image interactive ou ouverture plein écran dans un nouvel onglet) et bouton de téléchargement dédié.
+- **Nettoyage automatique** : Suppression physique des fichiers du disque lors de la suppression de la tâche associée.
 
 ### 📅 4. Agenda & Calendrier Interactif
 - **Vue mensuelle ergonomique** : Navigation d'un mois à l'autre avec mise en surbrillance de la date actuelle.
@@ -42,13 +43,13 @@
 - **Photo personnalisée** : Téléversement de sa propre image de profil (JPG, PNG, WEBP, GIF jusqu'à 5 Mo).
 - **Réinitialisation en un clic** : Retour instantané à l'avatar par défaut.
 
-### 🎨 6. Galerie de Thèmes Exclusifs & Système Liquid Glass
+### 🎨 6. Galerie de Thèmes Exclusifs & Système Apple Liquid Glass
 - **4 Thèmes Distincts Intégrés** :
   - ☀️ **Minimaliste Clair** : Design brutal-minimaliste épuré avec contrastes nets et fond immaculé.
   - 🌙 **Minimaliste Sombre** : Noir profond et ergonomie nocturne réduisant la fatigue visuelle.
-  - 💧 **Liquid Glass Clair** : Édition opalescente en verre liquide haute réfraction, reflets prismatiques doux et maillage boréal iridescent.
-  - 🌌 **Liquid Glass Sombre** : Édition obsidienne cryogénique en verre fumé, transparence optique et néons bioluminescents profonds (indigo/violet/teal).
-- **Moteur de Réfraction & Orbes Ambiants** : Filtres optiques avancés (`backdrop-filter: blur(32px) saturate(200%)`), biseaux spéculaires et halo de caustiques lumineuses animées en arrière-plan.
+  - 💧 **Apple Liquid Glass Clair** : Fidèle réplique du verre optique Apple (macOS Sonoma / visionOS Light) avec biseau spéculaire 1px (`inset 0 1px 1px rgba(255,255,255,0.95)`), réfraction chromatique et 4 orbes fluides en dérive orbitale animée.
+  - 🌌 **Apple Liquid Glass Sombre** : Édition obsidienne spatiale (visionOS Space Obsidian / macOS Midnight) avec plasma bioluminescent cosmique (indigo, pourpre, cyan) et arêtes ciselées réfléchissantes.
+- **Moteur de Réfraction & Verre Optique Apple** : Filtres optiques avancés (`backdrop-filter: blur(40px) saturate(200%)`), typographie SF Pro lissée, boutons d'action bleu Apple glossy et défilement macOS ultra-fin.
 - **Animations Cinématiques** : Exploitation de l'API moderne `document.startViewTransition` couplée à des transitions CSS fluides (`cubic-bezier(0.16, 1, 0.3, 1)`).
 - **Sélecteur Segmenté Direct** : Contrôle 4-en-1 accessible dans la barre latérale pour basculer en un clic et galerie visuelle détaillée dans les Paramètres.
 
@@ -179,9 +180,9 @@ To-Do-Task/
 ### Tâches (`/api/tasks`)
 - `GET /api/tasks` : Liste de toutes les tâches de l'utilisateur connecté.
 - `POST /api/tasks` : Création d'une nouvelle tâche.
-- `PUT /api/tasks/:id` : Mise à jour d'une tâche existante (nom, date, heure, statut).
-- `DELETE /api/tasks/:id` : Suppression d'une tâche (cascade SQL sur les documents liés).
-- `POST /api/tasks/:id/document` : Téléversement d'une pièce jointe pour une tâche donnée.
+- `PUT /api/tasks/:id` / `PATCH /api/tasks/:id` : Mise à jour complète ou partielle d'une tâche (nom, statut, dates).
+- `DELETE /api/tasks/:id` : Suppression d'une tâche (cascade SQL et suppression physique des documents liés sur le disque).
+- `POST /api/tasks/:id/document` : Téléversement d'une pièce jointe (stockage persistant `/app/uploads`).
 
 ---
 

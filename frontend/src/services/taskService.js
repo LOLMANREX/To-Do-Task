@@ -48,7 +48,13 @@ export const taskService = {
                 body: formData,
                 credentials: 'include'
             })
-            await checkResponse(uploadResponse)
+            const uploadedDoc = await checkResponse(uploadResponse)
+            return {
+                ...createdTask,
+                attachment: uploadedDoc.url || `/api/uploads/${uploadedDoc.stored_name}`,
+                attachmentName: uploadedDoc.original_name || attachment.name,
+                mimeType: uploadedDoc.mime_type || attachment.type
+            }
         }
 
         return createdTask
@@ -96,7 +102,13 @@ export const taskService = {
                 body: formData,
                 credentials: 'include'
             })
-            await checkResponse(uploadResponse)
+            const uploadedDoc = await checkResponse(uploadResponse)
+            return {
+                ...updatedTask,
+                attachment: uploadedDoc.url || `/api/uploads/${uploadedDoc.stored_name}`,
+                attachmentName: uploadedDoc.original_name || attachment.name,
+                mimeType: uploadedDoc.mime_type || attachment.type
+            }
         }
 
         return updatedTask

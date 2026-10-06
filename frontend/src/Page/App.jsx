@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { taskService } from '@/services/taskService'
-import { FileText, Download, X } from 'lucide-react'
+import { FileText, Download, X, ExternalLink } from 'lucide-react'
 
 export default function App() {
   const { user } = useAuth()
@@ -28,19 +28,15 @@ export default function App() {
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      setFormError('Le fichier dépasse 2 Mo.')
+      setFormError('Le fichier dépasse 5 Mo.')
       setAttachment(null)
       setAttachmentName(null)
       e.target.value = ''
       return
     }
     setFormError('')
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setAttachment(reader.result)
-      setAttachmentName(file.name)
-    }
-    reader.readAsDataURL(file)
+    setAttachment(file)
+    setAttachmentName(file.name)
   }
 
   const handleRemoveFile = () => {
@@ -111,11 +107,14 @@ export default function App() {
   }
 
   const handleStatusChange = async (taskId, newStatus) => {
+    const previousTasks = [...tasks]
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)))
     try {
       const updated = await taskService.updateTaskStatus(taskId, newStatus)
-      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, ...updated } : t)))
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, ...updated, status: newStatus } : t)))
     } catch (err) {
-      console.error(err)
+      console.error('Erreur mise à jour statut:', err)
+      setTasks(previousTasks)
     }
   }
 
@@ -274,26 +273,60 @@ export default function App() {
                       </span>
                       {t.completedAt && <span> Fait le {t.completedAt.split('T')[0]}</span>}
                     </div>
-                    {t.attachment && (
-                      <div className="pt-2">
-                        {t.attachment.startsWith('data:image') ? (
-                          <a href={t.attachment} download={t.attachmentName} className="inline-block transition-transform hover:scale-105">
-                            <img src={t.attachment} alt={t.attachmentName} className="w-12 h-12 object-cover rounded-md border border-slate-200 dark:border-zinc-700 shadow-sm" />
+                    {t.attachment && (() => {
+                      const isImage = t.mimeType?.startsWith('image/') || 
+                        /\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(t.attachmentName || t.attachment) ||
+                        t.attachment.startsWith('data:image');
+
+                      return (
+                        <div className="pt-2 flex items-center gap-3">
+                          {isImage ? (
+                            <a
+                              href={t.attachment}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={`Consulter ${t.attachmentName || 'l\'image'}`}
+                              className="group/img relative inline-block transition-transform hover:scale-105 cursor-pointer"
+                            >
+                              <img
+                                src={t.attachment}
+                                alt={t.attachmentName || 'Pièce jointe'}
+                                className="w-14 h-14 object-cover rounded-lg border border-slate-200 dark:border-zinc-700 shadow-sm group-hover/img:shadow-md transition-shadow"
+                              />
+                              <div className="absolute inset-0 rounded-lg bg-black/0 group-hover/img:bg-black/30 flex items-center justify-center transition-colors">
+                                <ExternalLink size={14} className="text-white opacity-0 group-hover/img:opacity-100 transition-opacity drop-shadow" />
+                              </div>
+                            </a>
+                          ) : (
+                            <a
+                              href={t.attachment}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Consulter le fichier"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 rounded-lg border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700 transition shadow-sm text-slate-700 dark:text-zinc-200 text-xs font-medium cursor-pointer group"
+                            >
+                              <FileText size={15} className="text-sky-500 shrink-0" />
+                              <span className="truncate max-w-[150px]">{t.attachmentName || 'Document'}</span>
+                              <ExternalLink size={13} className="opacity-60 group-hover:opacity-100" />
+                            </a>
+                          )}
+
+                          <a
+                            href={t.attachment}
+                            download={t.attachmentName || 'document'}
+                            title="Télécharger"
+                            className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/80 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300 transition cursor-pointer"
+                          >
+                            <Download size={14} />
                           </a>
-                        ) : (
-                          <a href={t.attachment} download={t.attachmentName} className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-zinc-800 rounded-md border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700 transition shadow-sm text-slate-700 dark:text-zinc-300">
-                            <FileText size={14} />
-                            <span className="truncate max-w-[120px] text-xs font-medium">{t.attachmentName}</span>
-                            <Download size={14} className="ml-1 opacity-70" />
-                          </a>
-                        )}
-                      </div>
-                    )}
+                        </div>
+                      )
+                    })()}
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <select
-                      value={t.status}
+                      value={t.status || 'todo'}
                       onChange={(e) => handleStatusChange(t.id, e.target.value)}
                       className="h-8 px-2 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 text-xs text-slate-700 dark:text-zinc-300 outline-none focus:border-zinc-500 cursor-pointer"
                     >

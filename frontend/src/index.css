@@ -20,152 +20,489 @@
   transition-delay: 0s !important;
 }
 
-@keyframes liquid-drift-1 {
-  0%, 100% {
+/* ----------------------------------------------------
+   Apple Liquid Glass Keyframe Animations
+---------------------------------------------------- */
+@keyframes apple-liquid-1 {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(60px, -45px) scale(1.15) rotate(12deg);
+  }
+  66% {
+    transform: translate(-30px, 55px) scale(0.92) rotate(-8deg);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes apple-liquid-2 {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(-50px, 40px) scale(1.12) rotate(-14deg);
+  }
+  66% {
+    transform: translate(45px, -35px) scale(0.95) rotate(10deg);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes apple-liquid-3 {
+  0% {
     transform: translate(0px, 0px) scale(1);
   }
   50% {
-    transform: translate(40px, -35px) scale(1.12);
+    transform: translate(35px, -50px) scale(1.18);
   }
-}
-
-@keyframes liquid-drift-2 {
-  0%, 100% {
+  100% {
     transform: translate(0px, 0px) scale(1);
   }
+}
+
+@keyframes apple-liquid-4 {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
   50% {
-    transform: translate(-35px, 45px) scale(1.08);
+    transform: translate(-40px, -30px) scale(1.08) rotate(15deg);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
   }
 }
 
-.animate-liquid-1 {
-  animation: liquid-drift-1 18s ease-in-out infinite alternate;
+@keyframes apple-pulse-glow {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
 }
 
-.animate-liquid-2 {
-  animation: liquid-drift-2 22s ease-in-out infinite alternate;
+@keyframes apple-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
 }
 
+.animate-apple-liquid-1 {
+  animation: apple-liquid-1 22s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-apple-liquid-2 {
+  animation: apple-liquid-2 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-apple-liquid-3 {
+  animation: apple-liquid-3 25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-apple-liquid-4 {
+  animation: apple-liquid-4 32s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-apple-pulse {
+  animation: apple-pulse-glow 14s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------
+   Base Font & Typography
+---------------------------------------------------- */
 @layer base {
   body {
     @apply m-0 min-h-screen font-sans bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100;
   }
 }
 
+html.glass-light,
+html.glass-dark {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* macOS-like subtle custom scrollbar for glass modes */
+html.glass-light ::-webkit-scrollbar,
+html.glass-dark ::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+html.glass-light ::-webkit-scrollbar-track,
+html.glass-dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.glass-light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+html.glass-light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+html.glass-dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+html.glass-dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ====================================================
+   1. APPLE LIQUID GLASS CLAIR (visionOS Light / macOS)
+==================================================== */
 html.glass-light body {
-  background-color: #f6f8fc;
+  background-color: #f5f7fc;
   background-image:
-    radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.8) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(253, 230, 238, 0.75) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(254, 240, 138, 0.5) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(224, 231, 255, 0.8) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(241, 245, 249, 0.6) 0px, transparent 50%);
+    radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 88% 12%, rgba(244, 114, 182, 0.38) 0%, transparent 45%),
+    radial-gradient(circle at 82% 86%, rgba(251, 191, 36, 0.32) 0%, transparent 45%),
+    radial-gradient(circle at 16% 92%, rgba(129, 140, 248, 0.38) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.7) 0%, transparent 60%);
   background-attachment: fixed;
-  color: #0f172a;
+  color: #1d1d1f;
 }
 
+/* Sidebar (macOS Vibrancy) */
 html.glass-light aside {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(32px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-  border-right-color: rgba(255, 255, 255, 0.65) !important;
-  box-shadow: 4px 0 24px -4px rgba(148, 163, 184, 0.15) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.52) 100%) !important;
+  backdrop-filter: blur(45px) saturate(200%) brightness(102%) !important;
+  -webkit-backdrop-filter: blur(45px) saturate(200%) brightness(102%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 4px 0 32px -4px rgba(15, 23, 42, 0.05), inset -1px 0 0 rgba(255, 255, 255, 0.85) !important;
 }
 
+html.glass-light aside nav a.active {
+  background: rgba(0, 113, 227, 0.12) !important;
+  color: #0071e3 !important;
+  border: 1px solid rgba(0, 113, 227, 0.22) !important;
+  box-shadow: 0 1px 4px rgba(0, 113, 227, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600;
+}
+
+html.glass-light aside nav a:not(.active):hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  color: #0f172a !important;
+}
+
+/* Header */
 html.glass-light header {
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  border-bottom-color: rgba(255, 255, 255, 0.6) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 100%) !important;
+  backdrop-filter: blur(40px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.04), inset 0 -1px 0 rgba(255, 255, 255, 0.85) !important;
 }
 
 html.glass-light main {
   background: transparent !important;
 }
 
+/* Glass Panels & Containers with Apple 1px specular bevel */
+html.glass-light [data-slot="card"],
 html.glass-light .bg-white,
 html.glass-light .bg-zinc-50,
+html.glass-light .bg-slate-50,
 html.glass-light .bg-zinc-50\/50 {
-  background: rgba(255, 255, 255, 0.52) !important;
-  backdrop-filter: blur(28px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-  border-color: rgba(255, 255, 255, 0.7) !important;
-  box-shadow: 0 16px 36px -10px rgba(148, 163, 184, 0.18), inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.9) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.48) 100%) !important;
+  backdrop-filter: blur(36px) saturate(190%) brightness(102%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(190%) brightness(102%) !important;
+  border-color: rgba(255, 255, 255, 0.78) !important;
+  box-shadow:
+    0 16px 40px -12px rgba(15, 23, 42, 0.08),
+    0 4px 12px -2px rgba(15, 23, 42, 0.03),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.02) !important;
 }
 
-html.glass-light input,
+/* Borders */
+html.glass-light .border-zinc-200,
+html.glass-light .border-slate-200,
+html.glass-light .border-zinc-100 {
+  border-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+/* Inputs & Form Controls (Apple milky glass) */
+html.glass-light input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 html.glass-light textarea,
 html.glass-light select {
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  color: #1d1d1f !important;
+  box-shadow: inset 0 1.5px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+html.glass-light input:focus,
+html.glass-light textarea:focus,
+html.glass-light select:focus {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.22), inset 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Primary Action Buttons (Apple System Blue gloss) */
+html.glass-light button[type="submit"],
+html.glass-light .btn-primary {
+  background: linear-gradient(180deg, #0077ED 0%, #0062D2 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 113, 227, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.45) !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+html.glass-light button[type="submit"]:hover,
+html.glass-light .btn-primary:hover {
+  background: linear-gradient(180deg, #1a85f5 0%, #006be5 100%) !important;
+  box-shadow: 0 6px 20px -2px rgba(0, 113, 227, 0.55), inset 0 1px 1px 0 rgba(255, 255, 255, 0.55) !important;
+  transform: translateY(-1px);
+}
+
+html.glass-light button[type="submit"]:active,
+html.glass-light .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Apple Segmented Controls (Filters / View Modes) */
+html.glass-light .flex.bg-slate-100,
+html.glass-light .flex.bg-zinc-200\/50,
+html.glass-light .grid.bg-zinc-200\/50 {
+  background: rgba(0, 0, 0, 0.05) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-color: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  border-radius: 12px !important;
 }
 
-html.glass-light .border-zinc-200,
-html.glass-light .border-zinc-100 {
-  border-color: rgba(255, 255, 255, 0.65) !important;
+html.glass-light .flex.bg-slate-100 button.bg-white,
+html.glass-light .flex.bg-zinc-200\/50 button.bg-white,
+html.glass-light .grid.bg-zinc-200\/50 button.bg-white {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0071e3 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 
+/* Modals & Dialogs (visionOS Glass Sheet) */
+html.glass-light .fixed.inset-0.bg-black\/60 {
+  background: rgba(15, 23, 42, 0.28) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+html.glass-light .fixed.inset-0.bg-black\/60 > div {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.68) 100%) !important;
+  backdrop-filter: blur(48px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    0 30px 80px -15px rgba(15, 23, 42, 0.22),
+    0 10px 30px -5px rgba(15, 23, 42, 0.1),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 1) !important;
+  border-radius: 24px !important;
+}
+
+/* Calendar Cells (Agenda) */
+html.glass-light .grid.grid-cols-7 > div {
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+html.glass-light .grid.grid-cols-7 > div:hover {
+  background: rgba(255, 255, 255, 0.38) !important;
+}
+
+
+/* ====================================================
+   2. APPLE LIQUID GLASS SOMBRE (visionOS Dark / Space Black)
+==================================================== */
 html.glass-dark body {
-  background-color: #05070d;
+  background-color: #060813;
   background-image:
-    radial-gradient(at 0% 0%, rgba(49, 46, 129, 0.55) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(88, 28, 135, 0.45) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(13, 148, 136, 0.4) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(30, 58, 138, 0.5) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.7) 0px, transparent 50%);
+    radial-gradient(circle at 14% 15%, rgba(99, 102, 241, 0.42) 0%, transparent 48%),
+    radial-gradient(circle at 86% 14%, rgba(168, 85, 247, 0.35) 0%, transparent 48%),
+    radial-gradient(circle at 82% 86%, rgba(6, 182, 212, 0.3) 0%, transparent 48%),
+    radial-gradient(circle at 14% 86%, rgba(236, 72, 153, 0.28) 0%, transparent 48%),
+    radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.55) 0%, transparent 60%);
   background-attachment: fixed;
-  color: #f8fafc;
+  color: #f5f5f7;
 }
 
+/* Sidebar (visionOS Obsidian) */
 html.glass-dark aside {
-  background: rgba(10, 14, 26, 0.62) !important;
-  backdrop-filter: blur(36px) saturate(210%) !important;
-  -webkit-backdrop-filter: blur(36px) saturate(210%) !important;
-  border-right-color: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 4px 0 32px -4px rgba(0, 0, 0, 0.6) !important;
+  background: linear-gradient(180deg, rgba(18, 22, 38, 0.7) 0%, rgba(10, 13, 24, 0.75) 100%) !important;
+  backdrop-filter: blur(48px) saturate(210%) brightness(105%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(210%) brightness(105%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 4px 0 36px -4px rgba(0, 0, 0, 0.7), inset -1px 0 0 rgba(255, 255, 255, 0.08) !important;
 }
 
+html.glass-dark aside nav a.active {
+  background: rgba(10, 132, 255, 0.22) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(10, 132, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  font-weight: 600;
+}
+
+html.glass-dark aside nav a:not(.active):hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Header */
 html.glass-dark header {
-  background: rgba(10, 14, 26, 0.65) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(180deg, rgba(18, 22, 38, 0.72) 0%, rgba(10, 13, 24, 0.78) 100%) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 28px -2px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
 html.glass-dark main {
   background: transparent !important;
 }
 
+/* Glass Panels & Containers with Apple 1px specular bevel */
+html.glass-dark [data-slot="card"],
 html.glass-dark .dark\:bg-zinc-950,
 html.glass-dark .dark\:bg-zinc-900,
+html.glass-dark .dark\:bg-zinc-900\/60,
 html.glass-dark .dark\:bg-zinc-900\/50,
+html.glass-dark .dark\:bg-zinc-900\/40,
+html.glass-dark .dark\:bg-zinc-900\/30,
 html.glass-dark .bg-zinc-900,
 html.glass-dark .bg-zinc-950 {
-  background: rgba(12, 17, 30, 0.58) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.16) !important;
+  background: linear-gradient(145deg, rgba(26, 32, 54, 0.68) 0%, rgba(13, 17, 30, 0.72) 100%) !important;
+  backdrop-filter: blur(40px) saturate(210%) brightness(105%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(210%) brightness(105%) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    0 24px 64px -16px rgba(0, 0, 0, 0.75),
+    0 8px 24px -6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
-html.glass-dark input,
+/* Borders */
+html.glass-dark .dark\:border-zinc-800,
+html.glass-dark .dark\:border-zinc-800\/80,
+html.glass-dark .dark\:border-zinc-900 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Inputs & Form Controls (Apple obsidian glass) */
+html.glass-dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 html.glass-dark textarea,
 html.glass-dark select {
-  background: rgba(15, 23, 42, 0.65) !important;
+  background: rgba(16, 21, 35, 0.68) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f5f5f7 !important;
+  box-shadow: inset 0 1.5px 4px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+html.glass-dark input:focus,
+html.glass-dark textarea:focus,
+html.glass-dark select:focus {
+  background: rgba(22, 29, 48, 0.88) !important;
+  border-color: #0a84ff !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.35), inset 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Primary Action Buttons (Apple Vision Blue gloss) */
+html.glass-dark button[type="submit"],
+html.glass-dark .btn-primary {
+  background: linear-gradient(180deg, #0a84ff 0%, #0066d6 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 18px -2px rgba(10, 132, 255, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.45) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+html.glass-dark button[type="submit"]:hover,
+html.glass-dark .btn-primary:hover {
+  background: linear-gradient(180deg, #2b95ff 0%, #0070eb 100%) !important;
+  box-shadow: 0 6px 24px -2px rgba(10, 132, 255, 0.65), inset 0 1px 1px 0 rgba(255, 255, 255, 0.6) !important;
+  transform: translateY(-1px);
+}
+
+html.glass-dark button[type="submit"]:active,
+html.glass-dark .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Apple Segmented Controls (Filters / View Modes) */
+html.glass-dark .flex.dark\:bg-zinc-900\/50,
+html.glass-dark .flex.dark\:bg-zinc-950,
+html.glass-dark .grid.dark\:bg-zinc-950 {
+  background: rgba(255, 255, 255, 0.07) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
 }
 
-html.glass-dark .dark\:border-zinc-800,
-html.glass-dark .dark\:border-zinc-900 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+html.glass-dark .flex.dark\:bg-zinc-900\/50 button.dark\:bg-zinc-800,
+html.glass-dark .flex.dark\:bg-zinc-950 button.dark\:bg-zinc-800,
+html.glass-dark .grid.dark\:bg-zinc-950 button.dark\:bg-zinc-800 {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Modals & Dialogs (visionOS Glass Sheet) */
+html.glass-dark .fixed.inset-0.bg-black\/60 {
+  background: rgba(0, 0, 0, 0.65) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+html.glass-dark .fixed.inset-0.bg-black\/60 > div {
+  background: linear-gradient(145deg, rgba(26, 32, 54, 0.88) 0%, rgba(13, 17, 30, 0.92) 100%) !important;
+  backdrop-filter: blur(52px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(52px) saturate(210%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    0 35px 90px -15px rgba(0, 0, 0, 0.85),
+    0 15px 40px -5px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35) !important;
+  border-radius: 24px !important;
+}
+
+/* Calendar Cells (Agenda) */
+html.glass-dark .grid.grid-cols-7 > div {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+html.glass-dark .grid.grid-cols-7 > div:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Shimmer pass */
 .liquid-shimmer {
   position: relative;
   overflow: hidden;
@@ -178,16 +515,7 @@ html.glass-dark .dark\:border-zinc-900 {
   left: -100%;
   width: 200%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   pointer-events: none;
-  animation: liquid-shimmer-pass 8s ease-in-out infinite;
-}
-
-@keyframes liquid-shimmer-pass {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+  animation: apple-shimmer 6s ease-in-out infinite;
 }

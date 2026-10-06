@@ -334,15 +334,19 @@ export default function Settings() {
                         <button
                             type="button"
                             onClick={() => setMode('glass-light')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'glass-light' ? 'border-sky-400 ring-2 ring-sky-400/30 bg-white/80 shadow-lg' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-sky-300'}`}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
+                                mode === 'glass-light'
+                                    ? 'border-white/80 ring-2 ring-sky-400/40 bg-white/75 shadow-[0_16px_36px_-10px_rgba(14,165,233,0.25)]'
+                                    : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-sky-300 dark:hover:border-sky-800'
+                            }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-400/20 to-pink-400/20 border border-sky-400/30 flex items-center justify-center text-sky-500 shadow-inner">
+                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-400/30 to-pink-400/30 border border-white/80 flex items-center justify-center text-sky-600 shadow-sm backdrop-blur-md">
                                     <Sparkles className="w-4 h-4" />
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-                                        Liquid Glass
+                                    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-sky-100/80 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border border-sky-300/60 dark:border-sky-800 backdrop-blur-sm">
+                                        Apple visionOS
                                     </span>
                                     {mode === 'glass-light' && (
                                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-600 text-white shadow-sm">
@@ -351,28 +355,35 @@ export default function Settings() {
                                     )}
                                 </div>
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Liquid Glass Clair</h3>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Verre opalescent givré, maillage boréal iridescent et reflets prismatiques doux.
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Clair</h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                Verre optique Apple, réfraction chromatique macOS Sonoma et biseau spéculaire 1px.
                             </p>
-                            <div className="mt-3 p-2 rounded-lg bg-gradient-to-r from-sky-100/80 via-pink-100/60 to-amber-100/80 border border-white/80 backdrop-blur-md flex items-center justify-between text-[11px] text-slate-700 font-medium">
-                                <span>Réfraction opalescente</span>
-                                <span>Aurore Boréale</span>
+                            <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-sky-200/50 via-pink-200/40 to-amber-200/50 border border-white/80 backdrop-blur-xl flex items-center justify-between text-[11px] text-slate-800 font-medium shadow-sm">
+                                <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+                                    Réfraction boréale
+                                </span>
+                                <span className="font-mono text-[10px] bg-white/70 px-1.5 py-0.5 rounded border border-white/80 text-sky-900">SF Pro • Sonoma</span>
                             </div>
                         </button>
 
                         <button
                             type="button"
                             onClick={() => setMode('glass-dark')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'glass-dark' ? 'border-indigo-400 ring-2 ring-indigo-400/30 bg-zinc-900/90 shadow-lg' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-indigo-400/50'}`}
+                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
+                                mode === 'glass-dark'
+                                    ? 'border-indigo-400/60 ring-2 ring-indigo-500/40 bg-zinc-900/90 shadow-[0_20px_45px_-12px_rgba(99,102,241,0.35)]'
+                                    : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-indigo-400/50'
+                            }`}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-inner">
+                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-500/30 to-purple-500/30 border border-white/20 flex items-center justify-center text-indigo-300 shadow-sm backdrop-blur-md">
                                     <Droplets className="w-4 h-4" />
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-800">
-                                        Liquid Glass
+                                    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 backdrop-blur-sm">
+                                        Space Obsidian
                                     </span>
                                     {mode === 'glass-dark' && (
                                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-600 text-white shadow-sm">
@@ -381,13 +392,16 @@ export default function Settings() {
                                     )}
                                 </div>
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Liquid Glass Sombre</h3>
+                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Sombre</h3>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Obsidienne liquide, verre fumé cryogénique et néons bioluminescents profonds.
+                                Obsidienne visionOS cosmique, plasma bioluminescent profond et reflets d'arête ciselés.
                             </p>
-                            <div className="mt-3 p-2 rounded-lg bg-gradient-to-r from-indigo-950/90 via-purple-950/70 to-teal-950/80 border border-white/10 backdrop-blur-md flex items-center justify-between text-[11px] text-indigo-200 font-medium">
-                                <span>Obsidienne plasma</span>
-                                <span>Bioluminescent</span>
+                            <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-indigo-950/90 via-purple-950/80 to-teal-950/80 border border-white/15 backdrop-blur-xl flex items-center justify-between text-[11px] text-indigo-200 font-medium shadow-sm">
+                                <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                                    Plasma stellaire
+                                </span>
+                                <span className="font-mono text-[10px] bg-black/50 px-1.5 py-0.5 rounded border border-white/10 text-indigo-300">SF Pro • Deep Space</span>
                             </div>
                         </button>
                     </div>
