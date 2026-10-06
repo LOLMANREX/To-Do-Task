@@ -1,7 +1,5 @@
-.env
-*.local
 node_modules/
 dist/
-uploads/*
-!uploads/.gitkeep
-.DS_Store
+uploads/
+.env
+database.sqlite
