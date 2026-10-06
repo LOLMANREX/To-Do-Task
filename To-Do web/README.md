@@ -142,10 +142,9 @@ To-Do-Task/
 
 ### Installation
 
-1. **Cloner le projet** :
+1. **Naviguer dans le dossier Web** :
    ```bash
-   git clone https://github.com/LOLMANREX/To-Do-Task.git
-   cd To-Do-Task
+   cd "To-Do web"
    ```
 
 2. **Créer le fichier d'environnement** :

@@ -3,3 +3,7 @@ dist/
 uploads/
 .env
 database.sqlite
+*.sqlite
+*.sqlite3
+*.log
+.DS_Store
