@@ -53,6 +53,18 @@ const ensureTables = async () => {
                 FOREIGN KEY(task_id) REFERENCES tasks(id)
             )
         `);
+        await execute(`
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                title TEXT NOT NULL DEFAULT 'Document sans titre',
+                content TEXT DEFAULT '',
+                pinned INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        `);
     } catch (e) {
         console.error('Error ensuring tables:', e);
     }

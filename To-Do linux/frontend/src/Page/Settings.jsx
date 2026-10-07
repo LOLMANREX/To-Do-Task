@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
 import { taskService } from '@/services/taskService'
+import { noteService } from '@/services/noteService'
 import { authService } from '@/services/authService'
 import { Avatar, DEFAULT_AVATARS } from '@/components/Avatar'
 
@@ -110,8 +111,11 @@ export default function Settings() {
     const handleExportData = async () => {
         setIsExporting(true)
         try {
-            const tasks = await taskService.getTasksByUser(user.id)
-            const dataStr = JSON.stringify({ user, tasks }, null, 2)
+            const [tasks, documents] = await Promise.all([
+                taskService.getTasksByUser(user.id).catch(() => []),
+                noteService.getNotes().catch(() => [])
+            ])
+            const dataStr = JSON.stringify({ user, tasks, documents }, null, 2)
             const blob = new Blob([dataStr], { type: 'application/json' })
             const url = URL.createObjectURL(blob)
             const link = document.createElement('a')

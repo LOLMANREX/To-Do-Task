@@ -9,6 +9,7 @@ dotenv.config();
 
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use('/api/uploads', express.static(uploadsDir));
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/notes', noteRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

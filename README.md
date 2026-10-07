@@ -40,12 +40,23 @@ Le projet est structuré en 3 dossiers autonomes selon vos besoins d'utilisation
   - Téléversement direct de fichiers (images, PDF, documents) jusqu'à 5 Mo.
   - Consultation en un clic, visualiseur d'images intégré et téléchargement direct.
   - Stockage persistant et nettoyage automatique sur suppression.
+- **📄 Éditeur de Documents & Notes Markdown (Haute Persistance)** :
+  - **Zéro perte de données** : double sauvegarde continue (sauvegarde immédiate en cache local `localStorage` + auto-save différé 1s en base de données MySQL ou SQLite). Les documents résistent aux fermetures inopinées, coupures et redémarrages de l'ordinateur ou du smartphone.
+  - **Rédaction plein écran épurée** : espace de travail centré et moderne sans distraction.
+  - **Barre d'outils riche** : Titres (H1-H3), gras, italique, souligné, barré, listes à puces et numérotées, cases à cocher / checklists interactives, blocs de code, citations et séparateurs.
+  - **Modes de vue flexibles** : mode Édition par défaut, mode Aperçu en direct et Double-vue (Split View) à la demande.
+  - **Gestion & Exportation** : recherche instantanée, épinglage en haut de liste, export Markdown (`.md`), Texte brut (`.txt`), impression PDF et intégration dans l'export JSON global.
+  - **Explorateur de documents escamotable** : liste latérale compacte avec masquage/démasquage en un clic pour maximiser la surface d'écriture.
+- **📂 Barre Latérale Rétractable (Style Google Gemini)** :
+  - Réduction instantanée de la navigation principale en un rail compact d'icônes (68px).
+  - Infobulles contextuelles, accès rapide au sélecteur de thème, simulateur mobile et profil.
+  - Mémorisation permanente du choix de l'utilisateur (`localStorage`).
 - **📅 Agenda & Calendrier Interactif** :
   - Vue mensuelle ergonomique avec repérage des tâches par jour et création rapide.
 - **👤 Profil Utilisateur & Avatars** :
   - 4 presets vectoriels SVG exclusifs sans dépendance externe.
   - Téléversement d'avatar photo personnalisé ou réinitialisation en 1 clic.
-  - Exportation intégrale des données utilisateur au format JSON.
+  - Exportation intégrale des données utilisateur au format JSON (tâches, profil, documents).
 
 ---
 

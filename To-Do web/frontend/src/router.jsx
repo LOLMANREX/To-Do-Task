@@ -7,6 +7,7 @@ import App from './Page/App'
 import Home from './Page/Home'
 import Settings from './Page/Settings'
 import Agenda from './Page/Agenda'
+import Editor from './Page/Editor'
 import NotFound from './Page/NotFound'
 import DashboardLayout from './layouts/DashboardLayout'
 
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
                     { path: '/dashboard', element: <Home /> },
                     { path: '/tasks', element: <App /> },
                     { path: '/agenda', element: <Agenda /> },
+                    { path: '/editor', element: <Editor /> },
                     { path: '/settings', element: <Settings /> }
                 ]
             }

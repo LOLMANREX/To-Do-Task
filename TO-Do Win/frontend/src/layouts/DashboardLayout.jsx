@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, Calendar, Settings, LogOut, Monitor, Smartphone, Sun, Moon, Sparkles, Droplets } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, Calendar, FileText, Settings, LogOut, Monitor, Smartphone, Sun, Moon, Sparkles, Droplets, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -50,6 +51,22 @@ export default function DashboardLayout() {
     const { viewMode, setViewMode, toggleViewMode, isMobile } = useViewMode()
     const navigate = useNavigate()
 
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        try {
+            return localStorage.getItem('sidebar_collapsed') === 'true'
+        } catch {
+            return false
+        }
+    })
+
+    const toggleSidebar = () => {
+        setIsSidebarCollapsed(prev => {
+            const next = !prev
+            try { localStorage.setItem('sidebar_collapsed', String(next)) } catch {}
+            return next
+        })
+    }
+
     const handleLogout = () => {
         logout()
         navigate('/login')
@@ -61,6 +78,7 @@ export default function DashboardLayout() {
         { path: '/dashboard', icon: LayoutDashboard, label: 'Accueil' },
         { path: '/tasks', icon: CheckSquare, label: 'Tâches' },
         { path: '/agenda', icon: Calendar, label: 'Agenda' },
+        { path: '/editor', icon: FileText, label: 'Éditeur' },
         { path: '/settings', icon: Settings, label: 'Paramètres' }
     ]
 
@@ -169,133 +187,207 @@ export default function DashboardLayout() {
         <div className={`flex h-screen w-full ${isGlass ? 'bg-transparent' : 'bg-zinc-50 dark:bg-zinc-950'} text-zinc-900 dark:text-zinc-100 font-sans transition-colors duration-300 relative overflow-hidden`}>
             {isGlass && <AppleLiquidCanvas mode={mode} />}
 
-            <aside className={`w-64 border-r ${
+            <aside className={`${isSidebarCollapsed ? 'w-[68px]' : 'w-64'} transition-all duration-300 ease-in-out border-r ${
                 isGlass
                     ? 'border-white/70 dark:border-white/10 bg-white/55 dark:bg-zinc-900/55 backdrop-blur-3xl shadow-[4px_0_30px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_30px_rgba(0,0,0,0.4)]'
                     : 'border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-950'
-            } flex flex-col justify-between shrink-0 transition-colors duration-300 relative z-10`}>
+            } flex flex-col justify-between shrink-0 relative z-10 select-none overflow-x-hidden`}>
                 <div>
-                    <div className={`h-14 flex items-center justify-between px-5 border-b ${isGlass ? 'border-white/60 dark:border-white/10' : 'border-zinc-200 dark:border-zinc-900'}`}>
-                        <span className="font-semibold text-sm tracking-tight">To-Do Task</span>
-                        <button
-                            type="button"
-                            onClick={toggleViewMode}
-                            title="Passer en vue mobile"
-                            className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
-                        >
-                            <Smartphone className="w-4 h-4" />
-                        </button>
+                    {/* Header: Title / Burger button */}
+                    <div className={`h-14 flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4'} border-b ${isGlass ? 'border-white/60 dark:border-white/10' : 'border-zinc-200 dark:border-zinc-900'} transition-all`}>
+                        {!isSidebarCollapsed ? (
+                            <>
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                    <button
+                                        type="button"
+                                        onClick={toggleSidebar}
+                                        title="Réduire le menu"
+                                        className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                    >
+                                        <PanelLeftClose className="w-4 h-4" />
+                                    </button>
+                                    <span className="font-bold text-sm tracking-tight truncate">To-Do Task</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={toggleViewMode}
+                                    title="Passer en vue mobile"
+                                    className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                >
+                                    <Smartphone className="w-4 h-4" />
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={toggleSidebar}
+                                title="Développer le menu"
+                                className="p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                            >
+                                <PanelLeftOpen className="w-5 h-5 text-sky-500" />
+                            </button>
+                        )}
                     </div>
 
-                    <nav className="p-3 space-y-0.5">
+                    {/* Nav Items */}
+                    <nav className="p-2.5 space-y-1">
                         {navItems.map((item) => (
                             <NavLink
                                 key={item.path}
                                 to={item.path}
+                                title={isSidebarCollapsed ? item.label : undefined}
                                 className={({ isActive }) =>
-                                    `flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                                    `flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-2.5 px-3 py-2'} rounded-xl text-sm font-medium transition-all group relative ${isActive
                                         ? isGlass
-                                            ? 'bg-sky-500/15 text-sky-600 dark:text-sky-300 dark:bg-sky-500/20 border border-sky-400/30 shadow-sm'
-                                            : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50'
+                                            ? 'bg-sky-500/15 text-sky-600 dark:text-sky-300 dark:bg-sky-500/20 border border-sky-400/30 shadow-sm font-semibold'
+                                            : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 font-semibold'
                                         : 'text-zinc-500 hover:bg-white/50 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-zinc-200'
                                     }`
                                 }
                             >
-                                <item.icon className="w-4 h-4" />
-                                {item.label}
+                                <item.icon className="w-4 h-4 shrink-0" />
+                                {!isSidebarCollapsed && (
+                                    <span className="truncate">{item.label}</span>
+                                )}
                             </NavLink>
                         ))}
                     </nav>
                 </div>
 
-                <div className={`p-3 border-t ${isGlass ? 'border-white/60 dark:border-white/10' : 'border-zinc-200 dark:border-zinc-900'} space-y-3`}>
-                    <div className={`${isGlass ? 'bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border-white/60 dark:border-white/10' : 'bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200/60 dark:border-zinc-800/60'} p-2.5 rounded-xl border`}>
-                        <div className="flex items-center justify-between mb-1.5 px-1">
-                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Thème</span>
-                        </div>
-                        <div className={`grid grid-cols-4 gap-1 p-1 ${isGlass ? 'bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/5' : 'bg-zinc-200/50 dark:bg-zinc-950'} rounded-lg mb-2.5`}>
-                            <button
-                                type="button"
-                                onClick={() => setMode('light')}
-                                title="Clair"
-                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'light' ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
-                            >
-                                <Sun className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode('dark')}
-                                title="Sombre"
-                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'dark' ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
-                            >
-                                <Moon className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode('glass-light')}
-                                title="Apple Liquid Glass Clair"
-                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-light' ? 'bg-white text-sky-600 shadow-sm border border-white ring-2 ring-sky-400/40' : 'text-zinc-500 hover:text-sky-600 dark:text-zinc-400'}`}
-                            >
-                                <Sparkles className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode('glass-dark')}
-                                title="Apple Liquid Glass Sombre"
-                                className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-dark' ? 'bg-zinc-800 text-indigo-300 shadow-sm border border-white/20 ring-2 ring-indigo-500/40' : 'text-zinc-500 hover:text-indigo-400 dark:text-zinc-400'}`}
-                            >
-                                <Droplets className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
+                {/* Footer */}
+                <div className={`p-2.5 border-t ${isGlass ? 'border-white/60 dark:border-white/10' : 'border-zinc-200 dark:border-zinc-900'} space-y-2.5`}>
+                    {!isSidebarCollapsed ? (
+                        <>
+                            {/* Full theme + viewmode widget */}
+                            <div className={`${isGlass ? 'bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border-white/60 dark:border-white/10' : 'bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200/60 dark:border-zinc-800/60'} p-2.5 rounded-xl border`}>
+                                <div className="flex items-center justify-between mb-1.5 px-1">
+                                    <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Thème</span>
+                                </div>
+                                <div className={`grid grid-cols-4 gap-1 p-1 ${isGlass ? 'bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/5' : 'bg-zinc-200/50 dark:bg-zinc-950'} rounded-lg mb-2.5`}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode('light')}
+                                        title="Clair"
+                                        className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'light' ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
+                                    >
+                                        <Sun className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode('dark')}
+                                        title="Sombre"
+                                        className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'dark' ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'}`}
+                                    >
+                                        <Moon className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode('glass-light')}
+                                        title="Apple Liquid Glass Clair"
+                                        className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-light' ? 'bg-white text-sky-600 shadow-sm border border-white ring-2 ring-sky-400/40' : 'text-zinc-500 hover:text-sky-600 dark:text-zinc-400'}`}
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode('glass-dark')}
+                                        title="Apple Liquid Glass Sombre"
+                                        className={`flex items-center justify-center p-1.5 rounded-md text-xs font-medium cursor-pointer transition-all ${mode === 'glass-dark' ? 'bg-zinc-800 text-indigo-300 shadow-sm border border-white/20 ring-2 ring-indigo-500/40' : 'text-zinc-500 hover:text-indigo-400 dark:text-zinc-400'}`}
+                                    >
+                                        <Droplets className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
 
-                        <div className="flex items-center justify-between mb-1.5 px-1">
-                            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Affichage</span>
-                        </div>
-                        <div className={`flex items-center ${isGlass ? 'bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/5' : 'bg-zinc-200/50 dark:bg-zinc-950'} p-1 rounded-lg`}>
+                                <div className="flex items-center justify-between mb-1.5 px-1">
+                                    <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Affichage</span>
+                                </div>
+                                <div className={`flex items-center ${isGlass ? 'bg-white/30 dark:bg-black/30 border border-white/40 dark:border-white/5' : 'bg-zinc-200/50 dark:bg-zinc-950'} p-1 rounded-lg`}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewMode('desktop')}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors ${viewMode === 'desktop'
+                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200/50 dark:border-zinc-700/50'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+                                            }`}
+                                    >
+                                        <Monitor className="w-3.5 h-3.5" /> PC
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setViewMode('mobile')}
+                                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors ${viewMode === 'mobile'
+                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200/50 dark:border-zinc-700/50'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+                                            }`}
+                                    >
+                                        <Smartphone className="w-3.5 h-3.5" /> Mobile
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${isGlass ? 'bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border-white/60 dark:border-white/10' : 'bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200/60 dark:border-zinc-800/60'} border`}>
+                                <Avatar user={user} size="sm" />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate text-zinc-900 dark:text-zinc-100">{displayName}</p>
+                                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate">{user?.email}</p>
+                                </div>
+                            </div>
+
                             <button
                                 type="button"
-                                onClick={() => setViewMode('desktop')}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors ${viewMode === 'desktop'
-                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200/50 dark:border-zinc-700/50'
-                                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
-                                    }`}
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-900 dark:hover:text-zinc-50 transition-colors cursor-pointer"
                             >
-                                <Monitor className="w-3.5 h-3.5" /> PC
+                                <LogOut className="w-4 h-4" />
+                                Déconnexion
                             </button>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center gap-2">
+                            {/* Compact Theme Cycle Button */}
                             <button
                                 type="button"
-                                onClick={() => setViewMode('mobile')}
-                                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors ${viewMode === 'mobile'
-                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200/50 dark:border-zinc-700/50'
-                                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
-                                    }`}
+                                onClick={toggleTheme}
+                                title={`Thème : ${mode} (cliquer pour changer)`}
+                                className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                             >
-                                <Smartphone className="w-3.5 h-3.5" /> Mobile
+                                {mode === 'glass-dark' && <Droplets className="w-4 h-4 text-indigo-400" />}
+                                {mode === 'glass-light' && <Sparkles className="w-4 h-4 text-sky-500" />}
+                                {mode === 'dark' && <Moon className="w-4 h-4 text-zinc-200" />}
+                                {mode === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
+                            </button>
+
+                            {/* Compact Viewmode Button */}
+                            <button
+                                type="button"
+                                onClick={toggleViewMode}
+                                title="Passer en vue mobile"
+                                className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                            >
+                                <Smartphone className="w-4 h-4" />
+                            </button>
+
+                            {/* Compact User Avatar */}
+                            <div title={displayName} className="p-1 cursor-default">
+                                <Avatar user={user} size="sm" />
+                            </div>
+
+                            {/* Compact Logout */}
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                title="Déconnexion"
+                                className="p-2 rounded-xl text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                            >
+                                <LogOut className="w-4 h-4" />
                             </button>
                         </div>
-                    </div>
-
-                    <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${isGlass ? 'bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border-white/60 dark:border-white/10' : 'bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200/60 dark:border-zinc-800/60'} border`}>
-                        <Avatar user={user} size="sm" />
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold truncate text-zinc-900 dark:text-zinc-100">{displayName}</p>
-                            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate">{user?.email}</p>
-                        </div>
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-900 dark:hover:text-zinc-50 transition-colors cursor-pointer"
-                    >
-                        <LogOut className="w-4 h-4" />
-                        Déconnexion
-                    </button>
+                    )}
                 </div>
             </aside>
 
             <main className={`flex-1 flex flex-col h-screen overflow-hidden ${isGlass ? 'bg-transparent' : 'bg-zinc-50 dark:bg-zinc-950'} transition-colors duration-300 relative z-10`}>
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                     <Outlet />
                 </div>
             </main>

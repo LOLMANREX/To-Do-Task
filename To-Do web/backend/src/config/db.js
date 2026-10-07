@@ -13,7 +13,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-const ensureColumns = async () => {
+const ensureDatabase = async () => {
     try {
         const [columns] = await pool.query('SHOW COLUMNS FROM users');
         const names = columns.map(c => c.Field);
@@ -28,8 +28,26 @@ const ensureColumns = async () => {
         }
     } catch (e) {
     }
+
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS notes (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                title VARCHAR(255) NOT NULL DEFAULT 'Document sans titre',
+                content LONGTEXT,
+                pinned TINYINT(1) DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                INDEX idx_notes_user (user_id)
+            )
+        `);
+    } catch (e) {
+        console.error('Error ensuring notes table in web db:', e);
+    }
 };
 
-ensureColumns();
+ensureDatabase();
 
 module.exports = pool;

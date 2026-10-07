@@ -53,17 +53,30 @@
 - **Animations Cinématiques** : Exploitation de l'API moderne `document.startViewTransition` couplée à des transitions CSS fluides (`cubic-bezier(0.16, 1, 0.3, 1)`).
 - **Sélecteur Segmenté Direct** : Contrôle 4-en-1 accessible dans la barre latérale pour basculer en un clic et galerie visuelle détaillée dans les Paramètres.
 
-### 📱 7. Simulateur Multi-Device
+### 📄 7. Éditeur de Documents & Notes Markdown (Haute Persistance)
+- **Persistance & Zéro perte de données** : Double sauvegarde instantanée (copie locale `localStorage` résistante aux redémarrages et coupures + synchronisation différée 1s vers la base MySQL).
+- **Rédaction plein écran épurée** : Mode d'édition centré, aéré et moderne sans panneau superflu.
+- **Barre d'outils riche** : Titres (H1-H3), styles de texte, listes à puces et numérotées, cases à cocher / checklists interactives, blocs de code, citations et séparateurs.
+- **Modes de vue adaptatifs** : Mode Édition par défaut, mode Aperçu en direct et Double-vue (Split View) à la demande.
+- **Explorateur de documents escamotable** : Liste des documents compacte, recherchable et masquable d'un clic pour libérer 100% de la largeur d'écran.
+- **Export & Impression** : Téléchargement Markdown (`.md`), Texte (`.txt`) et impression PDF directe.
+
+### 📂 8. Barre Latérale Rétractable (Style Google Gemini)
+- **Mode étendu (256px)** : Navigation complète, sélecteur de thème 4-en-1 et carte profil utilisateur.
+- **Mode réduit (68px)** : Rail compact d'icônes avec infobulles, changement de thème en un clic et avatar centré.
+- **Persistance du choix** : L'état du menu est automatiquement mémorisé dans le `localStorage`.
+
+### 📱 9. Simulateur Multi-Device
 - **Mode Bureau** : Barre latérale rétractable avec navigation complète et profil utilisateur en pied de page.
 - **Mode Mobile** : Mockup réaliste de smartphone avec Dynamic Island et barre de navigation tactile flottante, idéal pour les démonstrations et l'utilisation sur petits écrans.
 
-### 🔒 8. Sécurité & Authentification
+### 🔒 10. Sécurité & Authentification
 - **Chiffrement** : Hashage des mots de passe avec **Bcrypt** (salage à 10 tours).
 - **Session sécurisée** : Jetons **JWT** transmis via des cookies `httpOnly`, protégeant l'application contre les attaques XSS.
 - **Routes protégées** : Middleware d'authentification vérifiant le jeton à chaque requête API.
 
-### 💾 9. Portabilité & Sauvegarde
-- **Export JSON** : Sauvegarde en 1 clic de l'intégralité du compte utilisateur et de ses tâches sous format JSON structuré.
+### 💾 11. Portabilité & Sauvegarde
+- **Export JSON** : Sauvegarde en 1 clic de l'intégralité du compte utilisateur (tâches, profil, documents) sous format JSON structuré.
 
 ---
 

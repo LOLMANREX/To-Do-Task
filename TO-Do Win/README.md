@@ -8,6 +8,8 @@ Application de gestion de tâches et de productivité conçue pour **Windows** s
 
 - **100% Autonome** : Aucune dépendance externe ni Docker requis.
 - **Base de données SQLite** : Données stockées localement dans `database.sqlite`.
+- **Éditeur de documents Markdown persistant** : Sauvegarde automatique instantanée en base SQLite + cache local (zéro perte de données en cas de reboot ou crash), rédaction plein écran, barre d'outils complète et export MD/TXT/PDF.
+- **Barre latérale rétractable (Style Gemini)** : Réduction de la navigation principale en un rail compact d'icônes avec persistance de l'état.
 - **Design Apple Liquid Glass** : Thèmes Dark/Light avec effets visuels avancés.
 - **Packaging Windows** : Création d'installeur `.exe` (NSIS) via Electron Builder.
 
