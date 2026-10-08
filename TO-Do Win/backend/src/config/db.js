@@ -1,22 +1,76 @@
-const sqlite3 = require('sqlite3').verbose();
+const initSqlJs = require('sql.js');
 const path = require('path');
-const dbPath = process.env.DB_PATH || path.join(__dirname, '../../database.sqlite');
-const db = new sqlite3.Database(dbPath);
+const fs = require('fs');
 
-const execute = (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-        if (sql.trim().toUpperCase().startsWith('SELECT') || sql.trim().toUpperCase().startsWith('SHOW')) {
-            db.all(sql, params, (err, rows) => {
-                if (err) reject(err);
-                else resolve([rows]);
-            });
+const dbPath = process.env.DB_PATH || path.join(__dirname, '../../database.sqlite');
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+}
+
+let dbInstance = null;
+let initPromise = null;
+
+async function getDb() {
+    if (dbInstance) return dbInstance;
+    if (initPromise) return initPromise;
+    initPromise = (async () => {
+        const SQL = await initSqlJs();
+        if (fs.existsSync(dbPath)) {
+            try {
+                const buffer = fs.readFileSync(dbPath);
+                dbInstance = new SQL.Database(buffer);
+            } catch (err) {
+                console.warn('Erreur lecture SQLite, nouvelle base créée:', err);
+                dbInstance = new SQL.Database();
+                saveDb(dbInstance);
+            }
         } else {
-            db.run(sql, params, function(err) {
-                if (err) reject(err);
-                else resolve([{ insertId: this.lastID, affectedRows: this.changes }]);
-            });
+            dbInstance = new SQL.Database();
+            saveDb(dbInstance);
         }
-    });
+        return dbInstance;
+    })();
+    return initPromise;
+}
+
+function saveDb(db) {
+    try {
+        const data = db.export();
+        fs.writeFileSync(dbPath, Buffer.from(data));
+    } catch (e) {
+        console.error('Erreur sauvegarde SQLite sur le disque:', e);
+    }
+}
+
+const execute = async (sql, params = []) => {
+    const db = await getDb();
+    const cleanSql = sql.trim();
+    const isSelect = cleanSql.toUpperCase().startsWith('SELECT') || cleanSql.toUpperCase().startsWith('SHOW');
+
+    if (isSelect) {
+        const stmt = db.prepare(cleanSql);
+        stmt.bind(params);
+        const rows = [];
+        while (stmt.step()) {
+            rows.push(stmt.getAsObject());
+        }
+        stmt.free();
+        return [rows];
+    } else {
+        db.run(cleanSql, params);
+        let insertId = 0;
+        let affectedRows = 0;
+        try {
+            const res = db.exec("SELECT last_insert_rowid() AS lastId, changes() AS changes;");
+            if (res && res[0] && res[0].values && res[0].values[0]) {
+                insertId = res[0].values[0][0];
+                affectedRows = res[0].values[0][1];
+            }
+        } catch (_) {}
+        saveDb(db);
+        return [{ insertId, affectedRows }];
+    }
 };
 
 const ensureTables = async () => {
@@ -66,7 +120,7 @@ const ensureTables = async () => {
             )
         `);
     } catch (e) {
-        console.error('Error ensuring tables:', e);
+        console.error('Erreur initialisation tables SQLite:', e);
     }
 };
 

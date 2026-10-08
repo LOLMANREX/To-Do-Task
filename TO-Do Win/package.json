@@ -1,7 +1,7 @@
 {
   "name": "to-do-win",
   "version": "1.0.0",
-  "description": "",
+  "description": "Application de gestion de tâches et productivité To-Do Task",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -30,16 +30,17 @@
     "wait-on": "^9.5.1"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
-    "sqlite3": "^6.0.1"
+    "sql.js": "^1.14.2"
   },
   "build": {
+    "npmRebuild": false,
     "appId": "com.todo.win",
     "productName": "To-Do Task",
     "icon": "build/icon.ico",

@@ -17,10 +17,7 @@ if %errorlevel% neq 0 (
 
 echo [1/3] Preparation et compilation du Frontend PWA (Vite)...
 cd frontend
-if not exist node_modules (
-    echo Installation des dependances du frontend...
-    call npm install
-)
+call npm install
 call npm run build
 if %errorlevel% neq 0 (
     echo [ERREUR] La compilation du frontend a echoue.
@@ -31,10 +28,12 @@ if %errorlevel% neq 0 (
 cd ..
 
 echo.
-echo [2/3] Verification des dependances Electron et Backend...
-if not exist node_modules (
-    echo Installation des dependances principales...
-    call npm install
+echo [2/3] Verification des dependances Electron et Backend (100%% JavaScript)...
+call npm install
+if %errorlevel% neq 0 (
+    echo [ERREUR] L'installation des dependances a echoue.
+    pause
+    exit /b 1
 )
 
 echo.
@@ -49,7 +48,7 @@ if %errorlevel% neq 0 (
 echo.
 echo ========================================================
 echo   [SUCCES] L'installeur .exe a ete genere avec succes !
-echo   Dossier de sortie : dist/
+echo   Fichier genere : dist\To-Do-Task-Setup-1.0.0.exe
 echo ========================================================
 echo.
 pause
