@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur de démarrage - To-Do Task</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 32px;
+            background: rgba(30, 41, 59, 0.85);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #f87171;
+        }
+        p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Impossible de démarrer le service local</h1>
+        <p>Le serveur local n'a pas pu démarrer dans les délais prévus. Veuillez fermer et relancer l'application.</p>
+        <button onclick="window.location.reload()">Réessayer</button>
+    </div>
+</body>
+</html>

@@ -109,6 +109,8 @@ npm run dist
 L'installeur exécutable Windows (`.exe` NSIS) sera généré dans le sous-dossier `dist/`.
 
 > 💡 **Astuce de build Windows** : Les outils de compilation natifs Node (`node-gyp`) nécessitent que le chemin d'accès ne contienne pas d'espaces pour compiler les modules binaires (`sqlite3`, `bcrypt`). Si vous compilez depuis un terminal, veillez à utiliser un chemin sans espace ou compilez directement sous votre environnement Windows cible.
+> 
+> 🤖 **Compilation Cloud automatique (GitHub Actions)** : Un workflow CI/CD `.github/workflows/build-windows.yml` est disponible. Il compile automatiquement le setup `.exe` Windows sur un exécuteur `windows-latest` lors de chaque push sur `main`, tag `v*` ou manuellement via l'onglet **Actions** de GitHub (téléchargeable dans les Artifacts).
 
 ---
 

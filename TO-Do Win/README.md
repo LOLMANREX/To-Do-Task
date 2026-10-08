@@ -49,3 +49,15 @@ npm install
 npm run build
 cd ..
 ```
+
+---
+
+## 🤖 Compilation Automatique via GitHub Actions CI/CD
+
+Un workflow GitHub Actions (`.github/workflows/build-windows.yml`) est configuré pour compiler automatiquement l'installateur `.exe` Windows sans avoir besoin de machine Windows locale :
+
+1. **À chaque mise à jour** : Déclenché automatiquement lors d'un `git push` sur `main` qui modifie `TO-Do Win/`.
+2. **À la demande (manuel)** : Rendez-vous sur GitHub dans l'onglet **Actions** > **Build Windows App (.EXE)** > cliquez sur **Run workflow**.
+3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`To-Do-Task-Windows-Setup`).
+4. **Publication automatique** : Dès qu'un tag `v*` est créé ou lors d'une release GitHub, le setup `.exe` est directement publié dans les assets de la release.
+

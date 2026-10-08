@@ -18,10 +18,29 @@ async function createWindow() {
 
     // Start the backend server on a fixed port (e.g. 5005)
     const port = 5005;
-    const backendPath = path.join(__dirname, 'backend', 'src', 'index.js');
-    
-    backendProcess = spawn('node', [backendPath], {
-        env: { ...process.env, PORT: port, NODE_ENV: 'production' },
+    const isPackaged = app.isPackaged;
+
+    let backendPath = path.join(__dirname, 'backend', 'src', 'index.js');
+    if (isPackaged) {
+        backendPath = backendPath.replace('app.asar', 'app.asar.unpacked');
+    }
+
+    const userDataPath = app.getPath('userData');
+    const uploadsPath = isPackaged ? path.join(userDataPath, 'uploads') : path.join(__dirname, 'uploads');
+    const dbPath = isPackaged ? path.join(userDataPath, 'database.sqlite') : path.join(__dirname, 'database.sqlite');
+
+    const nodeExecutable = isPackaged ? process.execPath : 'node';
+    const env = {
+        ...process.env,
+        PORT: port,
+        NODE_ENV: 'production',
+        UPLOADS_PATH: uploadsPath,
+        DB_PATH: dbPath,
+        ...(isPackaged ? { ELECTRON_RUN_AS_NODE: '1' } : {})
+    };
+
+    backendProcess = spawn(nodeExecutable, [backendPath], {
+        env,
         stdio: 'inherit'
     });
 
@@ -30,7 +49,7 @@ async function createWindow() {
         mainWindow.loadURL(`http://localhost:${port}`);
     } catch (err) {
         console.error('Backend failed to start', err);
-        mainWindow.loadFile('error.html');
+        mainWindow.loadFile(path.join(__dirname, 'error.html'));
     }
 }
 

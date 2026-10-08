@@ -33,17 +33,29 @@
   },
   "build": {
     "appId": "com.todo.win",
-    "mac": {
-      "category": "your.app.category.type"
-    },
+    "productName": "To-Do Task",
     "win": {
       "target": [
         "nsis"
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "To-Do Task"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "backend/**/*",
+      "frontend/dist/**/*"
+    ],
     "files": [
       "index.js",
+      "error.html",
       "backend/**/*",
+      "!backend/node_modules/**/*",
       "frontend/dist/**/*"
     ]
   }
