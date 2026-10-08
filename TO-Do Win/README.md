@@ -11,7 +11,8 @@ Application de gestion de tâches et de productivité conçue pour **Windows** s
 - **Éditeur de documents Markdown persistant** : Sauvegarde automatique instantanée en base SQLite + cache local (zéro perte de données en cas de reboot ou crash), rédaction plein écran, barre d'outils complète et export MD/TXT/PDF.
 - **Barre latérale rétractable (Style Gemini)** : Réduction de la navigation principale en un rail compact d'icônes avec persistance de l'état.
 - **Design Apple Liquid Glass** : Thèmes Dark/Light avec effets visuels avancés.
-- **Packaging Windows** : Création d'installeur `.exe` (NSIS) via Electron Builder.
+- **Support PWA Intégré** : Web App Manifest complet, Service Worker avec cache local pour le fonctionnement hors-ligne et installabilité progressive.
+- **Packaging Windows & Setup .EXE** : Création d'installeur `.exe` (NSIS) via Electron Builder avec icône personnalisée, choix du dossier d'installation et raccourcis Bureau.
 
 ---
 
@@ -26,7 +27,7 @@ Application de gestion de tâches et de productivité conçue pour **Windows** s
 npm install
 ```
 
-### 2. Démarrage de l'application
+### 2. Démarrage de l'application en mode local
 ```bash
 npm start
 ```
@@ -34,21 +35,18 @@ Cette commande démarre le serveur backend local Express et ouvre la fenêtre na
 
 ---
 
-## 📦 Compilation & Création du fichier `.EXE`
+## 📦 Compilation & Création du Setup `.EXE`
 
-Pour générer l'installateur Windows (`.exe`) :
-```bash
-npm run dist
-```
-L'exécutable d'installation NSIS sera généré dans le répertoire `dist/`.
+Plusieurs méthodes sont disponibles pour générer votre installeur Windows (`To-Do-Task-Setup-1.0.0.exe`) :
 
-Pour recompiler le frontend React si vous apportez des modifications au code source dans `frontend/` :
+### Méthode 1 : Commande npm unique (recommandée)
 ```bash
-cd frontend
-npm install
-npm run build
-cd ..
+npm run setup
 ```
+*(Cette commande compile automatiquement le frontend PWA avec Vite, puis package l'application avec Electron Builder dans le dossier `dist/`).*
+
+### Méthode 2 : Double-clic sur Windows
+Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `TO-Do Win`. Il vérifie Node.js, compile le frontend et crée l'installeur `.exe` automatiquement.
 
 ---
 
