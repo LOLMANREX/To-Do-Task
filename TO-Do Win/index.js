@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
-const waitOn = require('wait-on');
 
 let mainWindow;
 let backendProcess;
@@ -18,7 +17,6 @@ async function createWindow() {
         },
     });
 
-    // Start the backend server on a fixed port (e.g. 5005)
     const port = 5005;
     const isPackaged = app.isPackaged;
 
@@ -46,12 +44,17 @@ async function createWindow() {
         stdio: 'inherit'
     });
 
-    try {
-        await waitOn({ resources: [`http-get://localhost:${port}/api/auth/me`], timeout: 30000, validateStatus: () => true });
-        mainWindow.loadURL(`http://localhost:${port}`);
-    } catch (err) {
-        console.error('Backend failed to start', err);
-        mainWindow.loadFile(path.join(__dirname, 'error.html'));
+    if (!isPackaged) {
+        try {
+            const waitOn = require('wait-on');
+            await waitOn({ resources: [`http-get://localhost:${port}/api/auth/me`], timeout: 30000, validateStatus: () => true });
+            mainWindow.loadURL(`http://localhost:${port}`);
+        } catch (err) {
+            console.error('Backend failed to start', err);
+            mainWindow.loadFile(path.join(__dirname, 'error.html'));
+        }
+    } else {
+        mainWindow.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
     }
 }
 
