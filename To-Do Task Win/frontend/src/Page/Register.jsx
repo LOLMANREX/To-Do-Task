@@ -154,7 +154,7 @@ export default function Register() {
                                 id="email"
                                 type="email"
                                 name="email"
-                                placeholder="nom@saint-gab.com"
+                                placeholder="Adresse mail"
                                 value={form.email}
                                 onChange={handleChange}
                                 required

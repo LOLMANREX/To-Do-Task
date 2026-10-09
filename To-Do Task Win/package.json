@@ -1,6 +1,6 @@
 {
   "name": "to-do-win",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Application de gestion de tâches et productivité To-Do Task Win",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "pwa",
     "windows"
   ],
-  "author": "",
+  "author": "To-Do Task",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
@@ -41,18 +41,22 @@
   },
   "build": {
     "npmRebuild": false,
-    "appId": "com.todo.win",
+    "appId": "com.todotask.win",
     "productName": "To-Do Task Win",
+    "copyright": "Copyright © 2026 To-Do Task",
     "icon": "build/icon.ico",
     "artifactName": "Installation.${ext}",
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "requestedExecutionLevel": "asInvoker",
+      "publisherName": "To-Do Task"
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,

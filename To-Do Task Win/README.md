@@ -56,7 +56,7 @@ npm run setup
 *(Cette commande compile automatiquement le frontend PWA avec Vite, puis package l'application avec Electron Builder dans le dossier `dist/`).*
 
 ### Méthode 2 : Double-clic sur Windows
-Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `TO-Do Win`. Il vérifie Node.js, compile le frontend et crée l'installeur `Installation.exe` automatiquement.
+Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `To-Do Task Win`. Il vérifie Node.js, compile le frontend et crée l'installeur `Installation.exe` automatiquement.
 
 ---
 
@@ -64,7 +64,7 @@ Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `T
 
 Un workflow GitHub Actions (`.github/workflows/build-windows.yml`) est configuré pour compiler automatiquement l'installateur `.exe` Windows sans avoir besoin de machine Windows locale :
 
-1. **À chaque mise à jour** : Déclenché automatiquement lors d'un `git push` sur `main` qui modifie `TO-Do Win/`.
+1. **À chaque mise à jour** : Déclenché automatiquement lors d'un `git push` sur `main` qui modifie `To-Do Task Win/`.
 2. **À la demande (manuel)** : Rendez-vous sur GitHub dans l'onglet **Actions** > **Build Windows App (.EXE)** > cliquez sur **Run workflow**.
 3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`To-Do-Task-Win-Installation`).
 4. **Publication automatique** : Dès qu'un tag `v*` est créé ou lors d'une release GitHub, le setup `.exe` est directement publié dans les assets de la release.

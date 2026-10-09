@@ -6,7 +6,7 @@ on:
       - main
       - master
     paths:
-      - 'TO-Do Win/**'
+      - 'To-Do Task Win/**'
       - '.github/workflows/build-windows.yml'
     tags:
       - 'v*'
@@ -15,7 +15,7 @@ on:
       - main
       - master
     paths:
-      - 'TO-Do Win/**'
+      - 'To-Do Task Win/**'
       - '.github/workflows/build-windows.yml'
   workflow_dispatch:
     inputs:
@@ -43,23 +43,23 @@ jobs:
           node-version: 22
           cache: 'npm'
           cache-dependency-path: |
-            TO-Do Win/package-lock.json
-            TO-Do Win/frontend/package-lock.json
+            To-Do Task Win/package-lock.json
+            To-Do Task Win/frontend/package-lock.json
 
       - name: Installer les dépendances du Frontend
-        working-directory: 'TO-Do Win/frontend'
+        working-directory: 'To-Do Task Win/frontend'
         run: npm ci
 
       - name: Compiler le Frontend (Vite)
-        working-directory: 'TO-Do Win/frontend'
+        working-directory: 'To-Do Task Win/frontend'
         run: npm run build
 
       - name: Installer les dépendances Electron & Backend
-        working-directory: 'TO-Do Win'
+        working-directory: 'To-Do Task Win'
         run: npm ci
 
       - name: Compiler le package installateur Windows (.exe NSIS)
-        working-directory: 'TO-Do Win'
+        working-directory: 'To-Do Task Win'
         run: npx electron-builder --win --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
@@ -69,7 +69,7 @@ jobs:
         with:
           name: To-Do-Task-Win-Installation
           path: |
-            TO-Do Win/dist/*.exe
+            To-Do Task Win/dist/*.exe
           if-no-files-found: error
           retention-days: 30
 
@@ -77,9 +77,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.event.inputs.create_release == 'true' || github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}
-          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'To-Do Task Win - Installation v1.0.0' }}
-          files: TO-Do Win/dist/*.exe
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.4' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'To-Do Task Win - Installation v1.0.4' }}
+          files: To-Do Task Win/dist/*.exe
           generate_release_notes: true
           make_latest: true
         env:

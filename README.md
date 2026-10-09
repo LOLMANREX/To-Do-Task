@@ -29,7 +29,7 @@ Le projet est structuré en 3 dossiers autonomes selon vos besoins d'utilisation
 | Dossier | Plateforme cible | Moteur de données | Packaging / Exécution |
 | :--- | :--- | :--- | :--- |
 | **[`To-Do web/`](./To-Do%20web)** | Web / Cloud SaaS | MySQL 8.4 (Docker) | Docker Compose (Nginx + Frontend + Backend + DB + phpMyAdmin) |
-| **[`TO-Do Win/`](./TO-Do%20Win)** | Windows Desktop | SQLite local autonome | Application Electron native & installeur `.exe` (NSIS) |
+| **[`To-Do Task Win/`](./To-Do%20Task%20Win)** | Windows Desktop | SQLite local autonome | Application Electron native & installeur `.exe` (NSIS) |
 | **[`To-Do linux/`](./To-Do%20linux)** | Linux Desktop | SQLite local autonome | Application Electron native & paquets `.AppImage` / `.deb` |
 
 ---
@@ -96,13 +96,13 @@ docker compose down
 
 ---
 
-### 2. 🪟 Version Windows Native (`TO-Do Win/`)
+### 2. 🪟 Version Windows Native (`To-Do Task Win/`)
 
 Version de bureau 100% autonome **sans Docker** : elle embarque son propre serveur local et une base de données **SQLite** persistée dans un fichier local `database.sqlite`.
 
 #### Lancement en mode local / développement :
 ```bash
-cd "TO-Do Win"
+cd "To-Do Task Win"
 
 # Installer les dépendances
 npm install
@@ -156,14 +156,14 @@ Les fichiers binaires exécutables (`.AppImage` et `.deb`) seront générés dan
  │                                       ├── /api  ──► Node.js Express (MySQL 8.4)
  │                                       └── :8080 ──► phpMyAdmin
  │
- ├── TO-Do Win/   ──► Electron Native ─► Fenêtre Desktop (React 19)
+ ├── To-Do Task Win/   ──► Electron Native ─► Fenêtre Desktop (React 19)
  │                                       └── Backend Express local + SQLite autonome (.EXE)
  │
  └── To-Do linux/ ──► Electron Native ─► Fenêtre Desktop (React 19)
                                          └── Backend Express local + SQLite autonome (.AppImage / .deb)
 ```
 
-| Composant | Édition Web (`To-Do web`) | Éditions Desktop (`TO-Do Win` / `To-Do linux`) |
+| Composant | Édition Web (`To-Do web`) | Éditions Desktop (`To-Do Task Win` / `To-Do linux`) |
 | :--- | :--- | :--- |
 | **Interface UI** | React 19 + Tailwind v4 + Lucide | React 19 + Tailwind v4 (embarqué dans Electron) |
 | **Serveur Backend** | Node.js Express sous conteneur | Node.js Express géré dynamiquement par Electron |
