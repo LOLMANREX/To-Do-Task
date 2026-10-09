@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
-
 let mainWindow;
 let backendProcess;
 
@@ -60,7 +59,7 @@ async function createWindow() {
 
 app.whenReady().then(() => {
     createWindow();
-    
+
     app.on('activate', function () {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
