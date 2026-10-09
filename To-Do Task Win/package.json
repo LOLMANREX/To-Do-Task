@@ -51,8 +51,7 @@
         "nsis"
       ],
       "icon": "build/icon.ico",
-      "requestedExecutionLevel": "asInvoker",
-      "publisherName": "To-Do Task"
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
