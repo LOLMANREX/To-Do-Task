@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createHashRouter, Navigate } from 'react-router-dom'
 import { PublicRoute } from './routes/PublicRoute'
 import { PrivateRoute } from './routes/PrivateRoute'
 import Login from './Page/Login'
@@ -11,7 +11,7 @@ import Editor from './Page/Editor'
 import NotFound from './Page/NotFound'
 import DashboardLayout from './layouts/DashboardLayout'
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
     {
         element: <PublicRoute />,
         children: [

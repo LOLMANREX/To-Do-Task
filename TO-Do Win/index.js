@@ -1,8 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 let mainWindow;
 let backendProcess;
+
+Menu.setApplicationMenu(null);
 
 async function createWindow() {
     mainWindow = new BrowserWindow({
@@ -10,9 +12,11 @@ async function createWindow() {
         icon: path.join(__dirname, 'build', 'icon.ico'),
         width: 1200,
         height: 800,
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            webSecurity: false,
         },
     });
 
