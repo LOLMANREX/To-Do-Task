@@ -3,7 +3,7 @@ chcp 65001 > nul
 setlocal enabledelayedexpansion
 
 echo ========================================================
-echo   Compilation de l'installeur Windows (.exe) - TO-Do Task win
+echo   Compilation de l'installeur Windows (.exe) - To-Do Task Win
 echo ========================================================
 echo.
 

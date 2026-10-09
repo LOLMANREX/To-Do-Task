@@ -1,4 +1,4 @@
-# 🪟 TO-Do Task win — Édition Windows Desktop Native (.EXE)
+# 🪟 To-Do Task Win — Édition Windows Desktop Native (.EXE)
 
 Application de gestion de tâches et de productivité conçue pour **Windows** sous la forme d'un exécutable natif autonome avec **Electron** et **SQLite 3**.
 
@@ -56,6 +56,6 @@ Un workflow GitHub Actions (`.github/workflows/build-windows.yml`) est configur�
 
 1. **À chaque mise à jour** : Déclenché automatiquement lors d'un `git push` sur `main` qui modifie `TO-Do Win/`.
 2. **À la demande (manuel)** : Rendez-vous sur GitHub dans l'onglet **Actions** > **Build Windows App (.EXE)** > cliquez sur **Run workflow**.
-3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`TO-Do-Task-win-Installation`).
+3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`To-Do-Task-Win-Installation`).
 4. **Publication automatique** : Dès qu'un tag `v*` est créé ou lors d'une release GitHub, le setup `.exe` est directement publié dans les assets de la release.
 

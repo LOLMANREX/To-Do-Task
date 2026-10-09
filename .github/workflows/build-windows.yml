@@ -67,7 +67,7 @@ jobs:
       - name: Téléverser l'installateur Windows comme Artifact GitHub
         uses: actions/upload-artifact@v4
         with:
-          name: TO-Do-Task-win-Installation
+          name: To-Do-Task-Win-Installation
           path: |
             TO-Do Win/dist/*.exe
           if-no-files-found: error

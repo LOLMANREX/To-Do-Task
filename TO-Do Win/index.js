@@ -8,7 +8,7 @@ let backendProcess;
 
 async function createWindow() {
     mainWindow = new BrowserWindow({
-        title: 'TO-Do Task win',
+        title: 'To-Do Task Win',
         icon: path.join(__dirname, 'build', 'icon.ico'),
         width: 1200,
         height: 800,
