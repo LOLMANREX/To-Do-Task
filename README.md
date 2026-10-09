@@ -28,9 +28,9 @@ Le projet est structuré en 3 dossiers autonomes selon vos besoins d'utilisation
 
 | Dossier | Plateforme cible | Moteur de données | Packaging / Exécution |
 | :--- | :--- | :--- | :--- |
-| **[`To-Do web/`](./To-Do%20web)** | Web / Cloud SaaS | MySQL 8.4 (Docker) | Docker Compose (Nginx + Frontend + Backend + DB + phpMyAdmin) |
+| **[`To-Do Task Web/`](./To-Do%20Task%20Web)** | Web / Cloud SaaS | MySQL 8.4 (Docker) | Docker Compose (Nginx + Frontend + Backend + DB + phpMyAdmin) |
 | **[`To-Do Task Win/`](./To-Do%20Task%20Win)** | Windows Desktop | SQLite local autonome | Application Electron native & installeur `.exe` (NSIS) |
-| **[`To-Do linux/`](./To-Do%20linux)** | Linux Desktop | SQLite local autonome | Application Electron native & paquets `.AppImage` / `.deb` |
+| **[`To-Do Task Linux/`](./To-Do%20Task%20Linux)** | Linux Desktop | SQLite local autonome | Application Electron native & paquets `.AppImage` / `.deb` |
 
 ---
 
@@ -71,12 +71,12 @@ Le projet est structuré en 3 dossiers autonomes selon vos besoins d'utilisation
 
 ## 🚀 Guides de Lancement Rapide
 
-### 1. 🌐 Version Web (`To-Do web/`)
+### 1. 🌐 Version Web (`To-Do Task Web/`)
 
 Idéale pour un hébergement en ligne ou un usage multi-utilisateurs avec Docker.
 
 ```bash
-cd "To-Do web"
+cd "To-Do Task Web"
 
 # 1. Copier le fichier d'environnement
 cp .env.example .env
@@ -123,13 +123,13 @@ L'installeur exécutable Windows (`.exe` NSIS) sera généré dans le sous-dossi
 
 ---
 
-### 3. 🐧 Version Linux Native (`To-Do linux/`)
+### 3. 🐧 Version Linux Native (`To-Do Task Linux/`)
 
 Version de bureau pour les distributions Linux (Ubuntu, Debian, Fedora, Arch, etc.), également 100% autonome grâce à la base locale **SQLite**.
 
 #### Lancement en mode local / développement :
 ```bash
-cd "To-Do linux"
+cd "To-Do Task Linux"
 
 # Installer les dépendances
 npm install
@@ -152,18 +152,18 @@ Les fichiers binaires exécutables (`.AppImage` et `.deb`) seront générés dan
 
 ```text
 [ To-Do Task Monorepo ]
- ├── To-Do web/   ──► Docker Compose ──► Nginx :80 ──► React 19 (Vite)
+ ├── To-Do Task Web/   ──► Docker Compose ──► Nginx :80 ──► React 19 (Vite)
  │                                       ├── /api  ──► Node.js Express (MySQL 8.4)
  │                                       └── :8080 ──► phpMyAdmin
  │
  ├── To-Do Task Win/   ──► Electron Native ─► Fenêtre Desktop (React 19)
  │                                       └── Backend Express local + SQLite autonome (.EXE)
  │
- └── To-Do linux/ ──► Electron Native ─► Fenêtre Desktop (React 19)
+ └── To-Do Task Linux/ ──► Electron Native ─► Fenêtre Desktop (React 19)
                                          └── Backend Express local + SQLite autonome (.AppImage / .deb)
 ```
 
-| Composant | Édition Web (`To-Do web`) | Éditions Desktop (`To-Do Task Win` / `To-Do linux`) |
+| Composant | Édition Web (`To-Do Task Web`) | Éditions Desktop (`To-Do Task Win` / `To-Do Task Linux`) |
 | :--- | :--- | :--- |
 | **Interface UI** | React 19 + Tailwind v4 + Lucide | React 19 + Tailwind v4 (embarqué dans Electron) |
 | **Serveur Backend** | Node.js Express sous conteneur | Node.js Express géré dynamiquement par Electron |

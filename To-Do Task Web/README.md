@@ -157,7 +157,7 @@ To-Do-Task/
 
 1. **Naviguer dans le dossier Web** :
    ```bash
-   cd "To-Do web"
+   cd "To-Do Task Web"
    ```
 
 2. **Créer le fichier d'environnement** :
