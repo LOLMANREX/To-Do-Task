@@ -13,6 +13,15 @@
 
 ---
 
+## ⚡ Téléchargement Direct Windows (Prêt à l'emploi)
+
+> 💡 **Aucune installation technique requise !** Vous n'avez pas besoin d'installer Node.js ni d'exécuter de fichier `.bat`. L'installeur officiel complet (`Installation.exe`) est directement disponible :
+
+[![Télécharger Installation.exe pour Windows](https://img.shields.io/badge/Télécharger_l'application_Windows-Installation.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/LOLMANREX/To-Do-Task/releases/latest/download/Installation.exe)
+[![Voir les Releases GitHub](https://img.shields.io/badge/Toutes_les_Releases-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/LOLMANREX/To-Do-Task/releases)
+
+---
+
 ## 📂 Organisation du Répertoire (3 Éditions)
 
 Le projet est structuré en 3 dossiers autonomes selon vos besoins d'utilisation et de déploiement :

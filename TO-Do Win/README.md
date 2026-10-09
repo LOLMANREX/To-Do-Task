@@ -4,6 +4,16 @@ Application de gestion de tâches et de productivité conçue pour **Windows** s
 
 ---
 
+## ⚡ Télécharger l'Installeur Directement (Sans Rien Compiler)
+
+> 💡 **Vous n'avez pas besoin d'installer Node.js ni de lancer le script `build-setup.bat` !**  
+> Téléchargez simplement l'exécutable d'installation officiel prêt à l'emploi :
+
+[![Télécharger Installation.exe pour Windows](https://img.shields.io/badge/Télécharger_l'application_Windows-Installation.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/LOLMANREX/To-Do-Task/releases/latest/download/Installation.exe)
+[![Voir sur GitHub Releases](https://img.shields.io/badge/Page_des_Releases-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/LOLMANREX/To-Do-Task/releases)
+
+---
+
 ## 🌟 Caractéristiques
 
 - **100% Autonome** : Aucune dépendance externe ni Docker requis.
