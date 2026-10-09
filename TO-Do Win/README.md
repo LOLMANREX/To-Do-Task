@@ -1,4 +1,4 @@
-# 🪟 To-Do Task — Édition Windows Desktop Native (.EXE)
+# 🪟 TO-Do Task win — Édition Windows Desktop Native (.EXE)
 
 Application de gestion de tâches et de productivité conçue pour **Windows** sous la forme d'un exécutable natif autonome avec **Electron** et **SQLite 3**.
 
@@ -37,7 +37,7 @@ Cette commande démarre le serveur backend local Express et ouvre la fenêtre na
 
 ## 📦 Compilation & Création du Setup `.EXE`
 
-Plusieurs méthodes sont disponibles pour générer votre installeur Windows (`To-Do-Task-Setup-1.0.0.exe`) :
+Plusieurs méthodes sont disponibles pour générer votre installeur Windows (`Installation.exe`) :
 
 ### Méthode 1 : Commande npm unique (recommandée)
 ```bash
@@ -46,7 +46,7 @@ npm run setup
 *(Cette commande compile automatiquement le frontend PWA avec Vite, puis package l'application avec Electron Builder dans le dossier `dist/`).*
 
 ### Méthode 2 : Double-clic sur Windows
-Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `TO-Do Win`. Il vérifie Node.js, compile le frontend et crée l'installeur `.exe` automatiquement.
+Double-cliquez simplement sur le script **`build-setup.bat`** à la racine de `TO-Do Win`. Il vérifie Node.js, compile le frontend et crée l'installeur `Installation.exe` automatiquement.
 
 ---
 
@@ -56,6 +56,6 @@ Un workflow GitHub Actions (`.github/workflows/build-windows.yml`) est configur�
 
 1. **À chaque mise à jour** : Déclenché automatiquement lors d'un `git push` sur `main` qui modifie `TO-Do Win/`.
 2. **À la demande (manuel)** : Rendez-vous sur GitHub dans l'onglet **Actions** > **Build Windows App (.EXE)** > cliquez sur **Run workflow**.
-3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`To-Do-Task-Windows-Setup`).
+3. **Téléchargement direct (Artifacts)** : Cliquez sur le run terminé, puis téléchargez le fichier dans la section **Artifacts** (`TO-Do-Task-win-Installation`).
 4. **Publication automatique** : Dès qu'un tag `v*` est créé ou lors d'une release GitHub, le setup `.exe` est directement publié dans les assets de la release.
 

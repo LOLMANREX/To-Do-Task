@@ -1,7 +1,7 @@
 {
   "name": "to-do-win",
   "version": "1.0.0",
-  "description": "Application de gestion de tâches et productivité To-Do Task",
+  "description": "Application de gestion de tâches et productivité TO-Do Task win",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -42,9 +42,9 @@
   "build": {
     "npmRebuild": false,
     "appId": "com.todo.win",
-    "productName": "To-Do Task",
+    "productName": "TO-Do Task win",
     "icon": "build/icon.ico",
-    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "artifactName": "Installation.${ext}",
     "win": {
       "target": [
         "nsis"
@@ -56,7 +56,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "To-Do Task",
+      "shortcutName": "TO-Do Task win",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "runAfterFinish": true

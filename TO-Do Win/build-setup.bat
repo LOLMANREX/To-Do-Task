@@ -3,7 +3,7 @@ chcp 65001 > nul
 setlocal enabledelayedexpansion
 
 echo ========================================================
-echo   Compilation de l'installeur Windows (.exe) - To-Do Task
+echo   Compilation de l'installeur Windows (.exe) - TO-Do Task win
 echo ========================================================
 echo.
 
@@ -48,7 +48,7 @@ if %errorlevel% neq 0 (
 echo.
 echo ========================================================
 echo   [SUCCES] L'installeur .exe a ete genere avec succes !
-echo   Fichier genere : dist\To-Do-Task-Setup-1.0.0.exe
+echo   Fichier genere : dist\Installation.exe
 echo ========================================================
 echo.
 pause
