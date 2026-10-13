@@ -20,7 +20,7 @@ async function createWindow() {
         },
     });
 
-    const port = 5005;
+    const port = 3000;
     const isPackaged = app.isPackaged;
 
     let backendPath = path.join(__dirname, 'backend', 'src', 'index.js');

@@ -11,7 +11,7 @@ if (window.location.protocol === 'file:') {
   const originalFetch = window.fetch;
   window.fetch = function (url, options) {
     if (typeof url === 'string' && url.startsWith('/api/')) {
-      url = 'http://localhost:5005' + url;
+      url = 'http://localhost:3000' + url;
     }
     return originalFetch(url, options);
   };

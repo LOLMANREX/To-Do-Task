@@ -16,7 +16,7 @@ const checkResponse = async (response) => {
 
 export const noteService = {
     async getNotes() {
-        const response = await fetch('/api/notes', {
+        const response = await fetch('http://localhost:3000/api/notes', {
             method: 'GET',
             credentials: 'include'
         })
@@ -24,7 +24,7 @@ export const noteService = {
     },
 
     async getNote(id) {
-        const response = await fetch(`/api/notes/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -32,7 +32,7 @@ export const noteService = {
     },
 
     async createNote(data) {
-        const response = await fetch('/api/notes', {
+        const response = await fetch('http://localhost:3000/api/notes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ export const noteService = {
     },
 
     async updateNote(id, data) {
-        const response = await fetch(`/api/notes/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,14 +56,13 @@ export const noteService = {
     },
 
     async deleteNote(id) {
-        const response = await fetch(`/api/notes/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
             method: 'DELETE',
             credentials: 'include'
         })
         return checkResponse(response)
     },
 
-    // LocalStorage resilient backup caching
     getLocalBackup(userId, noteId) {
         try {
             const key = `todo_doc_draft_${userId || 'guest'}_${noteId}`

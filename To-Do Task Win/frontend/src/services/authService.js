@@ -1,6 +1,6 @@
 export const authService = {
     async register({ firstName, lastName, email, password }) {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('http://localhost:3000/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ export const authService = {
     },
 
     async login(email, password) {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ export const authService = {
     },
     
     async me() {
-        const response = await fetch('/api/auth/me', {
+        const response = await fetch('http://localhost:3000/api/auth/me', {
             method: 'GET',
             credentials: 'include'
         })
@@ -46,7 +46,7 @@ export const authService = {
     },
 
     async updateProfile({ firstName, lastName }) {
-        const response = await fetch('/api/auth/profile', {
+        const response = await fetch('http://localhost:3000/api/auth/profile', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -66,7 +66,7 @@ export const authService = {
         const formData = new FormData()
         formData.append('avatar', file)
 
-        const response = await fetch('/api/auth/avatar', {
+        const response = await fetch('http://localhost:3000/api/auth/avatar', {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -80,7 +80,7 @@ export const authService = {
     },
 
     async deleteAvatar() {
-        const response = await fetch('/api/auth/avatar', {
+        const response = await fetch('http://localhost:3000/api/auth/avatar', {
             method: 'DELETE',
             credentials: 'include'
         })
@@ -93,7 +93,7 @@ export const authService = {
     },
 
     async setAvatarPreset(avatarUrl) {
-        const response = await fetch('/api/auth/avatar-preset', {
+        const response = await fetch('http://localhost:3000/api/auth/avatar-preset', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
