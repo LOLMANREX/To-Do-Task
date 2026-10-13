@@ -1,6 +1,6 @@
 {
   "name": "to-do-win",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Application de gestion de tâches et productivité To-Do Task Win",
   "main": "index.js",
   "scripts": {
@@ -41,14 +41,25 @@
   },
   "build": {
     "npmRebuild": false,
+    "compression": "maximum",
     "appId": "com.todotask.win",
     "productName": "To-Do Task Win",
     "copyright": "Copyright © 2026 To-Do Task",
     "icon": "build/icon.ico",
     "artifactName": "Installation.${ext}",
+    "afterPack": "build/afterPack.js",
+    "electronLanguages": [
+      "fr",
+      "en-US"
+    ],
     "win": {
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "build/icon.ico",
       "requestedExecutionLevel": "asInvoker"
@@ -62,19 +73,21 @@
       "shortcutName": "To-Do Task Win",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
-      "runAfterFinish": true
+      "runAfterFinish": true,
+      "differentialPackage": false
     },
     "asar": true,
-    "asarUnpack": [
-      "backend/**/*",
-      "frontend/dist/**/*"
-    ],
     "files": [
       "index.js",
       "error.html",
-      "backend/**/*",
-      "!backend/node_modules/**/*",
-      "frontend/dist/**/*"
+      "backend/src/**/*",
+      "frontend/dist/**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,test,tests,example,examples,docs,.github}",
+      "!**/node_modules/sql.js/dist/sql-asm*",
+      "!**/node_modules/sql.js/dist/worker*",
+      "!**/node_modules/sql.js/dist/*.zip",
+      "!**/node_modules/sql.js/dist/*debug*",
+      "!**/node_modules/sql.js/dist/sql-wasm-browser*"
     ]
   }
 }
