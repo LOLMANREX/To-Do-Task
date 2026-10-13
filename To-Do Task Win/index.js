@@ -1,10 +1,61 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const fs = require('fs');
+
 let mainWindow;
-let backendProcess;
+let serverInstance;
 
 Menu.setApplicationMenu(null);
+
+async function startBackendServer(defaultPort = 3000) {
+    const isPackaged = app.isPackaged;
+    const userDataPath = app.getPath('userData');
+
+    const uploadsPath = isPackaged
+        ? path.join(userDataPath, 'uploads')
+        : path.join(__dirname, 'uploads');
+    const dbPath = isPackaged
+        ? path.join(userDataPath, 'database.sqlite')
+        : path.join(__dirname, 'database.sqlite');
+
+    if (!fs.existsSync(uploadsPath)) {
+        fs.mkdirSync(uploadsPath, { recursive: true });
+    }
+    const dbDir = path.dirname(dbPath);
+    if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+    }
+
+    process.env.UPLOADS_PATH = uploadsPath;
+    process.env.DB_PATH = dbPath;
+    process.env.NODE_ENV = 'production';
+    if (!process.env.JWT_SECRET) {
+        process.env.JWT_SECRET = 'todo_desktop_jwt_secret_fallback_key_2026';
+    }
+
+    let backendModulePath = path.join(__dirname, 'backend', 'src', 'index.js');
+    if (isPackaged && !fs.existsSync(backendModulePath)) {
+        backendModulePath = backendModulePath.replace('app.asar', 'app.asar.unpacked');
+    }
+
+    const { startServer } = require(backendModulePath);
+
+    // Essai sur le port par défaut (3000), puis fallback sur 3001 si déjà utilisé
+    try {
+        process.env.PORT = String(defaultPort);
+        serverInstance = await startServer(defaultPort);
+        return defaultPort;
+    } catch (err) {
+        if (err.code === 'EADDRINUSE') {
+            const fallbackPort = defaultPort + 1;
+            console.warn(`Port ${defaultPort} occupé, tentative sur le port ${fallbackPort}...`);
+            process.env.PORT = String(fallbackPort);
+            serverInstance = await startServer(fallbackPort);
+            return fallbackPort;
+        }
+        throw err;
+    }
+}
 
 async function createWindow() {
     mainWindow = new BrowserWindow({
@@ -20,44 +71,15 @@ async function createWindow() {
         },
     });
 
-    const port = 3000;
-    const isPackaged = app.isPackaged;
-
-    let backendPath = path.join(__dirname, 'backend', 'src', 'index.js');
-    if (isPackaged) {
-        backendPath = backendPath.replace('app.asar', 'app.asar.unpacked');
-    }
-
-    const userDataPath = app.getPath('userData');
-    const uploadsPath = isPackaged ? path.join(userDataPath, 'uploads') : path.join(__dirname, 'uploads');
-    const dbPath = isPackaged ? path.join(userDataPath, 'database.sqlite') : path.join(__dirname, 'database.sqlite');
-
-    const nodeExecutable = isPackaged ? process.execPath : 'node';
-    const env = {
-        ...process.env,
-        PORT: port,
-        NODE_ENV: 'production',
-        UPLOADS_PATH: uploadsPath,
-        DB_PATH: dbPath,
-        ...(isPackaged ? { ELECTRON_RUN_AS_NODE: '1' } : {})
-    };
-
-    backendProcess = spawn(nodeExecutable, [backendPath], {
-        env,
-        stdio: 'inherit'
-    });
-
-    if (!isPackaged) {
-        try {
-            const waitOn = require('wait-on');
-            await waitOn({ resources: [`http-get://localhost:${port}/api/auth/me`], timeout: 30000, validateStatus: () => true });
-            mainWindow.loadURL(`http://localhost:${port}`);
-        } catch (err) {
-            console.error('Backend failed to start', err);
-            mainWindow.loadFile(path.join(__dirname, 'error.html'));
+    try {
+        const port = await startBackendServer(3000);
+        await mainWindow.loadURL(`http://localhost:${port}`);
+    } catch (err) {
+        console.error('Erreur au lancement du serveur local:', err);
+        const errorHtmlPath = path.join(__dirname, 'error.html');
+        if (fs.existsSync(errorHtmlPath)) {
+            mainWindow.loadFile(errorHtmlPath);
         }
-    } else {
-        mainWindow.loadFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
     }
 }
 
@@ -74,7 +96,7 @@ app.on('window-all-closed', function () {
 });
 
 app.on('quit', () => {
-    if (backendProcess) {
-        backendProcess.kill();
+    if (serverInstance && typeof serverInstance.close === 'function') {
+        serverInstance.close();
     }
 });

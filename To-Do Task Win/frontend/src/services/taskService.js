@@ -1,3 +1,5 @@
+import { apiUrl } from '../lib/api';
+
 const checkResponse = async (response) => {
     if (response.status === 401) {
         window.dispatchEvent(new Event('unauthorized'))
@@ -11,7 +13,7 @@ const checkResponse = async (response) => {
 
 export const taskService = {
     async getTasksByUser() {
-        const response = await fetch('http://localhost:3000/api/tasks', {
+        const response = await fetch(apiUrl('/api/tasks'), {
             method: 'GET',
             credentials: 'include'
         })
@@ -30,7 +32,7 @@ export const taskService = {
             delete data.attachmentName
         }
 
-        const response = await fetch('http://localhost:3000/api/tasks', {
+        const response = await fetch(apiUrl('/api/tasks'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -43,7 +45,7 @@ export const taskService = {
         if (attachment) {
             const formData = new FormData()
             formData.append('document', attachment)
-            const uploadResponse = await fetch(`http://localhost:3000/api/tasks/${createdTask.id}/document`, {
+            const uploadResponse = await fetch(apiUrl(`/api/tasks/${createdTask.id}/document`), {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -51,7 +53,7 @@ export const taskService = {
             const uploadedDoc = await checkResponse(uploadResponse)
             return {
                 ...createdTask,
-                attachment: uploadedDoc.url || `http://localhost:3000/api/uploads/${uploadedDoc.stored_name}`,
+                attachment: uploadedDoc.url || apiUrl(`/api/uploads/${uploadedDoc.stored_name}`),
                 attachmentName: uploadedDoc.original_name || attachment.name,
                 mimeType: uploadedDoc.mime_type || attachment.type
             }
@@ -61,7 +63,7 @@ export const taskService = {
     },
 
     async updateTaskStatus(taskId, status) {
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+        const response = await fetch(apiUrl(`/api/tasks/${taskId}`), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -84,7 +86,7 @@ export const taskService = {
             delete data.attachmentName
         }
 
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+        const response = await fetch(apiUrl(`/api/tasks/${taskId}`), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -97,7 +99,7 @@ export const taskService = {
         if (attachment) {
             const formData = new FormData()
             formData.append('document', attachment)
-            const uploadResponse = await fetch(`http://localhost:3000/api/tasks/${updatedTask.id}/document`, {
+            const uploadResponse = await fetch(apiUrl(`/api/tasks/${updatedTask.id}/document`), {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -105,7 +107,7 @@ export const taskService = {
             const uploadedDoc = await checkResponse(uploadResponse)
             return {
                 ...updatedTask,
-                attachment: uploadedDoc.url || `http://localhost:3000/api/uploads/${uploadedDoc.stored_name}`,
+                attachment: uploadedDoc.url || apiUrl(`/api/uploads/${uploadedDoc.stored_name}`),
                 attachmentName: uploadedDoc.original_name || attachment.name,
                 mimeType: uploadedDoc.mime_type || attachment.type
             }
@@ -115,7 +117,7 @@ export const taskService = {
     },
 
     async deleteTask(taskId) {
-        const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
+        const response = await fetch(apiUrl(`/api/tasks/${taskId}`), {
             method: 'DELETE',
             credentials: 'include'
         })

@@ -33,9 +33,19 @@ app.use('/api/notes', noteRoutes);
 
 // Serve the built frontend
 const frontendDist = path.join(__dirname, '../../frontend/dist');
-app.use(express.static(frontendDist));
-app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendDist, 'index.html'));
+if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+}
+app.use((req, res) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ message: 'API route not found' });
+    }
+    const indexPath = path.join(frontendDist, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send('Frontend not built yet');
+    }
 });
 
 const PORT = process.env.PORT || 3000;

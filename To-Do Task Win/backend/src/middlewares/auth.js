@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'todo_desktop_jwt_secret_fallback_key_2026';
+
 const auth = (req, res, next) => {
     try {
         const token = req.cookies.jwt;
@@ -7,7 +9,7 @@ const auth = (req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
         req.userId = decoded.userId;
         next();
     } catch (err) {

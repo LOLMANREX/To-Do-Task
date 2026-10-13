@@ -19,7 +19,9 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 app.use(cors({
-    origin: true,
+    origin: (origin, callback) => {
+        callback(null, true);
+    },
     credentials: true
 }));
 
@@ -33,12 +35,60 @@ app.use('/api/notes', noteRoutes);
 
 // Serve the built frontend
 const frontendDist = path.join(__dirname, '../../frontend/dist');
-app.use(express.static(frontendDist));
-app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendDist, 'index.html'));
+if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+}
+
+app.use((req, res) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ message: 'API route not found' });
+    }
+    const indexPath = path.join(frontendDist, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send('Frontend not built yet');
+    }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+let serverInstance = null;
+
+function startServer(port = process.env.PORT || 3000) {
+    if (serverInstance) {
+        return Promise.resolve(serverInstance);
+    }
+    return new Promise((resolve, reject) => {
+        const server = app.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+            serverInstance = server;
+            resolve(server);
+        });
+        server.on('error', (err) => {
+            console.error(`Server error on port ${port}:`, err);
+            reject(err);
+        });
+    });
+}
+
+function stopServer() {
+    return new Promise((resolve) => {
+        if (serverInstance) {
+            serverInstance.close(() => {
+                serverInstance = null;
+                resolve();
+            });
+        } else {
+            resolve();
+        }
+    });
+}
+
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    startServer(PORT).catch((err) => {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    });
+}
+
+module.exports = { app, startServer, stopServer };

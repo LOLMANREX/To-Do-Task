@@ -1,6 +1,6 @@
 {
   "name": "to-do-win",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Application de gestion de tâches et productivité To-Do Task Win",
   "main": "index.js",
   "scripts": {

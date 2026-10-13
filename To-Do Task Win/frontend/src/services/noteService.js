@@ -1,3 +1,5 @@
+import { apiUrl } from '../lib/api';
+
 const checkResponse = async (response) => {
     if (response.status === 401) {
         window.dispatchEvent(new Event('unauthorized'))
@@ -16,7 +18,7 @@ const checkResponse = async (response) => {
 
 export const noteService = {
     async getNotes() {
-        const response = await fetch('http://localhost:3000/api/notes', {
+        const response = await fetch(apiUrl('/api/notes'), {
             method: 'GET',
             credentials: 'include'
         })
@@ -24,7 +26,7 @@ export const noteService = {
     },
 
     async getNote(id) {
-        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
+        const response = await fetch(apiUrl(`/api/notes/${id}`), {
             method: 'GET',
             credentials: 'include'
         })
@@ -32,7 +34,7 @@ export const noteService = {
     },
 
     async createNote(data) {
-        const response = await fetch('http://localhost:3000/api/notes', {
+        const response = await fetch(apiUrl('/api/notes'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -44,7 +46,7 @@ export const noteService = {
     },
 
     async updateNote(id, data) {
-        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
+        const response = await fetch(apiUrl(`/api/notes/${id}`), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,7 +58,7 @@ export const noteService = {
     },
 
     async deleteNote(id) {
-        const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
+        const response = await fetch(apiUrl(`/api/notes/${id}`), {
             method: 'DELETE',
             credentials: 'include'
         })
