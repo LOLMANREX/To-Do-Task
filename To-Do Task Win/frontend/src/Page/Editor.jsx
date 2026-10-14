@@ -819,16 +819,16 @@ export default function Editor() {
     }
 
     return (
-        <div className="space-y-4 animate-in fade-in duration-300 h-full flex flex-col pb-4">
+        <div className="space-y-6 animate-in fade-in duration-500 h-full flex flex-col pb-4">
             {/* Header info */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5">
-                        <FileText className="w-7 h-7 text-sky-500" />
+                    <h1 className={`text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 ${isGlass ? 'drop-shadow-sm' : ''} flex items-center gap-3`}>
+                        <FileText className="w-8 h-8 text-sky-500 shrink-0" />
                         Éditeur de documents
                     </h1>
-                    <p className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-0.5">
-                        Rédigez, organisez et conservez vos documents avec sauvegarde persistante multi-supports.
+                    <p className={`mt-1.5 text-sm sm:text-base font-medium ${isGlass ? 'text-zinc-700 dark:text-zinc-300 drop-shadow-sm' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                        Rédigez, organisez et conservez vos documents avec sauvegarde automatique.
                     </p>
                 </div>
 
@@ -836,7 +836,7 @@ export default function Editor() {
                     <button
                         type="button"
                         onClick={handleCreateNote}
-                        className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-sky-500 hover:bg-sky-600 active:scale-95 text-white shadow-md shadow-sky-500/20 transition-all cursor-pointer"
+                        className="flex items-center gap-2 h-10 px-4 rounded-xl text-xs sm:text-sm font-semibold bg-sky-500 hover:bg-sky-600 active:scale-95 text-white shadow-sm shadow-sky-500/20 transition-all cursor-pointer"
                     >
                         <Plus className="w-4 h-4 stroke-[2.5]" />
                         Nouveau document

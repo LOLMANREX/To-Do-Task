@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Monitor, Smartphone, Sun, Moon, Upload, RotateCcw, Check, User as UserIcon, Sparkles, Droplets } from 'lucide-react'
+import { Monitor, Smartphone, Sun, Moon, Upload, RotateCcw, Check, User as UserIcon, Sparkles, Droplets, Settings as SettingsIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useViewMode } from '@/contexts/ViewModeContext'
@@ -10,7 +10,7 @@ import { Avatar, DEFAULT_AVATARS } from '@/components/Avatar'
 
 export default function Settings() {
     const { user, updateUser } = useAuth()
-    const { mode, setMode } = useTheme()
+    const { mode, setMode, isGlass } = useTheme()
     const { viewMode, setViewMode } = useViewMode()
     const [isExporting, setIsExporting] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
@@ -24,6 +24,10 @@ export default function Settings() {
     })
 
     const fileInputRef = useRef(null)
+
+    const cardGlass = "bg-white/60 dark:bg-zinc-900/60 backdrop-blur-3xl backdrop-saturate-200 border border-white/80 dark:border-white/15 shadow-[0_16px_40px_-12px_rgba(15,23,42,0.08)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.7)]"
+    const cardSolid = "bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 shadow-sm"
+    const currentCardClass = isGlass ? cardGlass : cardSolid
 
     useEffect(() => {
         if (user) {
@@ -133,12 +137,17 @@ export default function Settings() {
     }
 
     return (
-        <div className="max-w-3xl space-y-8 animate-in fade-in duration-300">
-            <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Paramètres</h1>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                    Préférences de votre compte, apparence et gestion des données.
-                </p>
+        <div className="max-w-4xl space-y-8 animate-in fade-in duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className={`text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 ${isGlass ? 'drop-shadow-sm' : ''} flex items-center gap-3`}>
+                        <SettingsIcon className="w-8 h-8 text-purple-500 shrink-0" />
+                        Paramètres
+                    </h1>
+                    <p className={`mt-1.5 text-sm sm:text-base font-medium ${isGlass ? 'text-zinc-700 dark:text-zinc-300 drop-shadow-sm' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                        Préférences de votre compte, apparence visuelle et gestion des données.
+                    </p>
+                </div>
             </div>
 
             {statusMessage && (
@@ -155,18 +164,21 @@ export default function Settings() {
             )}
 
             <div className="space-y-8">
+                {/* Section Photo de profil */}
                 <section className="space-y-4">
-                    <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Photo de profil</h2>
+                    <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        Photo de profil
+                    </h2>
                     
-                    <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                        <Avatar user={user} size="2xl" className="ring-4 ring-zinc-100 dark:ring-zinc-800" />
+                    <div className={`p-5 sm:p-6 rounded-2xl ${currentCardClass} flex flex-col sm:flex-row items-center sm:items-start gap-6`}>
+                        <Avatar user={user} size="2xl" className="ring-4 ring-zinc-200 dark:ring-zinc-800 shadow-md" />
                         
                         <div className="flex-1 space-y-3 text-center sm:text-left">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                                <span className="font-bold text-base text-zinc-900 dark:text-zinc-100">
                                     {[user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email?.split('@')[0]}
                                 </span>
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 self-center sm:self-auto border border-zinc-200 dark:border-zinc-700">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 self-center sm:self-auto border border-zinc-200 dark:border-zinc-700">
                                     {user?.avatarUrl ? 'Photo personnalisée' : 'Photo par défaut'}
                                 </span>
                             </div>
@@ -186,7 +198,7 @@ export default function Settings() {
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={isUploading}
-                                    className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
+                                    className="flex items-center gap-2 h-9 px-3.5 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-semibold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer disabled:opacity-50"
                                 >
                                     <Upload className="w-3.5 h-3.5" />
                                     {isUploading ? 'Chargement...' : 'Changer la photo'}
@@ -197,7 +209,7 @@ export default function Settings() {
                                         type="button"
                                         onClick={handleResetAvatar}
                                         disabled={isUploading}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-xs font-medium transition-colors cursor-pointer"
+                                        className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
                                     >
                                         <RotateCcw className="w-3.5 h-3.5" />
                                         Réinitialiser
@@ -205,9 +217,9 @@ export default function Settings() {
                                 )}
                             </div>
 
-                            <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+                            <div className="pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60">
                                 <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2.5">
-                                    Ou choisir un avatar par défaut :
+                                    Ou choisir un avatar prédéfini :
                                 </p>
                                 <div className="flex items-center gap-2.5 justify-center sm:justify-start">
                                     {DEFAULT_AVATARS.map((preset) => {
@@ -217,7 +229,7 @@ export default function Settings() {
                                                 key={preset.id}
                                                 type="button"
                                                 onClick={() => handleSelectPreset(preset.url)}
-                                                className={`relative h-10 w-10 rounded-full overflow-hidden border-2 transition-all cursor-pointer hover:scale-105 ${isSelected ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-400/40' : 'border-transparent opacity-75 hover:opacity-100'}`}
+                                                className={`relative h-10 w-10 rounded-full overflow-hidden border-2 transition-all cursor-pointer hover:scale-105 ${isSelected ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-purple-500/40 shadow-sm' : 'border-transparent opacity-75 hover:opacity-100'}`}
                                                 title={preset.name}
                                             >
                                                 <img src={preset.url} alt={preset.name} className="h-full w-full object-cover" />
@@ -230,11 +242,14 @@ export default function Settings() {
                     </div>
                 </section>
 
-                <hr className="border-zinc-200 dark:border-zinc-900" />
+                <hr className="border-zinc-200/80 dark:border-zinc-800/80" />
 
+                {/* Section Informations personnelles */}
                 <section className="space-y-4">
-                    <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Informations personnelles</h2>
-                    <form onSubmit={handleProfileSubmit} className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
+                    <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        Informations personnelles
+                    </h2>
+                    <form onSubmit={handleProfileSubmit} className={`p-5 sm:p-6 rounded-2xl ${currentCardClass} space-y-4`}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
@@ -245,7 +260,7 @@ export default function Settings() {
                                     value={profileForm.firstName}
                                     onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })}
                                     placeholder="Ex: Alexandre"
-                                    className="w-full px-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all"
+                                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950/60 text-sm font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                                 />
                             </div>
                             <div>
@@ -257,7 +272,7 @@ export default function Settings() {
                                     value={profileForm.lastName}
                                     onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
                                     placeholder="Ex: Dupont"
-                                    className="w-full px-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all"
+                                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950/60 text-sm font-medium text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -266,7 +281,7 @@ export default function Settings() {
                             <button
                                 type="submit"
                                 disabled={isSavingProfile}
-                                className="px-4 py-2 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
+                                className="h-10 px-4 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs sm:text-sm font-semibold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer disabled:opacity-50"
                             >
                                 {isSavingProfile ? 'Enregistrement...' : 'Enregistrer les modifications'}
                             </button>
@@ -274,12 +289,15 @@ export default function Settings() {
                     </form>
                 </section>
 
-                <hr className="border-zinc-200 dark:border-zinc-900" />
+                <hr className="border-zinc-200/80 dark:border-zinc-800/80" />
 
+                {/* Section Thèmes & Ambiances */}
                 <section className="space-y-4">
                     <div>
-                        <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Thèmes & Ambiances</h2>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            Thèmes & Ambiances
+                        </h2>
+                        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                             Sélectionnez l'univers visuel et le niveau de réfraction de l'interface.
                         </p>
                     </div>
@@ -288,7 +306,7 @@ export default function Settings() {
                         <button
                             type="button"
                             onClick={() => setMode('light')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'light' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
+                            className={`p-5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'light' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
                         >
                             <div className="flex items-center justify-between mb-3">
                                 <div className="h-8 w-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
@@ -300,11 +318,11 @@ export default function Settings() {
                                     </span>
                                 )}
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Clair</h3>
+                            <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Clair</h3>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Style SaaS brutal-minimaliste épuré avec contrastes nets et fond immaculé.
+                                Style épuré avec contrastes nets et fond clair reposant.
                             </p>
-                            <div className="mt-3 p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-300">
+                            <div className="mt-3 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-300">
                                 <span>Contraste élevé</span>
                                 <span className="font-mono">#FFFFFF</span>
                             </div>
@@ -313,7 +331,7 @@ export default function Settings() {
                         <button
                             type="button"
                             onClick={() => setMode('dark')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'dark' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
+                            className={`p-5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${mode === 'dark' ? 'border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-white dark:bg-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700'}`}
                         >
                             <div className="flex items-center justify-between mb-3">
                                 <div className="h-8 w-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
@@ -325,11 +343,11 @@ export default function Settings() {
                                     </span>
                                 )}
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Sombre</h3>
+                            <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">Minimaliste Sombre</h3>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                                 Noir profond et élégance nocturne réduisant la fatigue visuelle.
                             </p>
-                            <div className="mt-3 p-2 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400">
+                            <div className="mt-3 p-2 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400">
                                 <span>Nocturne pur</span>
                                 <span className="font-mono">#09090B</span>
                             </div>
@@ -338,7 +356,7 @@ export default function Settings() {
                         <button
                             type="button"
                             onClick={() => setMode('glass-light')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
+                            className={`p-5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
                                 mode === 'glass-light'
                                     ? 'border-white/80 ring-2 ring-sky-400/40 bg-white/75 shadow-[0_16px_36px_-10px_rgba(14,165,233,0.25)]'
                                     : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-sky-300 dark:hover:border-sky-800'
@@ -359,9 +377,9 @@ export default function Settings() {
                                     )}
                                 </div>
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Clair</h3>
+                            <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Clair</h3>
                             <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Verre optique Apple, réfraction chromatique macOS Sonoma et biseau spéculaire 1px.
+                                Verre optique Apple, réfraction chromatique et biseau spéculaire lumineux.
                             </p>
                             <div className="mt-3 p-2.5 rounded-xl bg-gradient-to-r from-sky-200/50 via-pink-200/40 to-amber-200/50 border border-white/80 backdrop-blur-xl flex items-center justify-between text-[11px] text-slate-800 font-medium shadow-sm">
                                 <span className="flex items-center gap-1.5">
@@ -375,7 +393,7 @@ export default function Settings() {
                         <button
                             type="button"
                             onClick={() => setMode('glass-dark')}
-                            className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
+                            className={`p-5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
                                 mode === 'glass-dark'
                                     ? 'border-indigo-400/60 ring-2 ring-indigo-500/40 bg-zinc-900/90 shadow-[0_20px_45px_-12px_rgba(99,102,241,0.35)]'
                                     : 'border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 hover:border-indigo-400/50'
@@ -396,7 +414,7 @@ export default function Settings() {
                                     )}
                                 </div>
                             </div>
-                            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Sombre</h3>
+                            <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">Apple Liquid Glass Sombre</h3>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
                                 Obsidienne visionOS cosmique, plasma bioluminescent profond et reflets d'arête ciselés.
                             </p>
@@ -411,54 +429,69 @@ export default function Settings() {
                     </div>
                 </section>
 
-                <hr className="border-zinc-200 dark:border-zinc-900" />
+                <hr className="border-zinc-200/80 dark:border-zinc-800/80" />
 
+                {/* Section Mode d'affichage */}
                 <section className="space-y-4">
-                    <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Mode d'affichage</h2>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        Format d'affichage pour la présentation et la démonstration.
-                    </p>
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setViewMode('desktop')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border transition-all cursor-pointer ${viewMode === 'desktop'
-                                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
-                                    : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
-                                }`}
-                        >
-                            <Monitor className="w-4 h-4" />
-                            Ordinateur
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setViewMode('mobile')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border transition-all cursor-pointer ${viewMode === 'mobile'
-                                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
-                                    : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
-                                }`}
-                        >
-                            <Smartphone className="w-4 h-4" />
-                            Mobile
-                        </button>
+                    <div>
+                        <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            Mode d'affichage
+                        </h2>
+                        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                            Format d'affichage pour la présentation et la démonstration.
+                        </p>
+                    </div>
+
+                    <div className={`p-5 sm:p-6 rounded-2xl ${currentCardClass}`}>
+                        <div className="flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('desktop')}
+                                className={`flex items-center gap-2 h-10 px-4 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer ${viewMode === 'desktop'
+                                        ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
+                                        : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
+                                    }`}
+                            >
+                                <Monitor className="w-4 h-4" />
+                                Ordinateur
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('mobile')}
+                                className={`flex items-center gap-2 h-10 px-4 rounded-xl text-xs sm:text-sm font-semibold border transition-all cursor-pointer ${viewMode === 'mobile'
+                                        ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
+                                        : 'border-zinc-200 bg-white text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
+                                    }`}
+                            >
+                                <Smartphone className="w-4 h-4" />
+                                Mobile
+                            </button>
+                        </div>
                     </div>
                 </section>
 
-                <hr className="border-zinc-200 dark:border-zinc-900" />
+                <hr className="border-zinc-200/80 dark:border-zinc-800/80" />
 
+                {/* Section Données locales */}
                 <section className="space-y-4">
-                    <h2 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Données locales</h2>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        Exportez l'intégralité de vos tâches stockées sur ce compte.
-                    </p>
-                    <button
-                        type="button"
-                        onClick={handleExportData}
-                        disabled={isExporting}
-                        className="px-4 py-2 rounded-md bg-zinc-100 text-zinc-900 text-sm font-medium hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                    >
-                        {isExporting ? 'Exportation...' : 'Exporter en JSON'}
-                    </button>
+                    <div>
+                        <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                            Données locales
+                        </h2>
+                        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                            Exportez l'intégralité de vos tâches et documents stockés sur ce compte.
+                        </p>
+                    </div>
+                    <div className={`p-5 sm:p-6 rounded-2xl ${currentCardClass}`}>
+                        <button
+                            type="button"
+                            onClick={handleExportData}
+                            disabled={isExporting}
+                            className="h-10 px-4 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-xs sm:text-sm font-semibold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                        >
+                            {isExporting ? 'Exportation...' : 'Exporter en JSON'}
+                        </button>
+                    </div>
                 </section>
             </div>
         </div>

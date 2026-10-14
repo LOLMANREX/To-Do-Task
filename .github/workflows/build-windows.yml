@@ -77,8 +77,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.event.inputs.create_release == 'true' || github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.9' }}
-          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'To-Do Task Win - Installation v1.0.9' }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.10' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'To-Do Task Win - Installation v1.0.10' }}
           files: To-Do Task Win/dist/*.exe
           generate_release_notes: true
           make_latest: true
