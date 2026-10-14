@@ -519,3 +519,19 @@ html.glass-dark .grid.grid-cols-7 > div:hover {
   pointer-events: none;
   animation: apple-shimmer 6s ease-in-out infinite;
 }
+
+/* ----------------------------------------------------
+   Print Styles: Clean printout of text documents
+---------------------------------------------------- */
+@media print {
+  nav,
+  aside,
+  header,
+  footer,
+  button,
+  .no-print,
+  .fixed,
+  canvas {
+    display: none !important;
+  }
+}

@@ -12,6 +12,380 @@ import { useViewMode } from '@/contexts/ViewModeContext'
 import { noteService } from '@/services/noteService'
 import MarkdownPreview from '@/components/MarkdownPreview'
 
+function generatePrintHtml(title, markdownContent) {
+    const cleanTitle = (title || 'Document sans titre').trim()
+    const content = markdownContent || ''
+    const lines = content.split('\n')
+    
+    let html = ''
+    let inCodeBlock = false
+    let codeBuffer = []
+    let codeLang = ''
+    let inList = false
+    let listType = null
+    let tableBuffer = []
+
+    const flushList = () => {
+        if (inList) {
+            html += listType === 'ul' ? '</ul>\n' : '</ol>\n'
+            inList = false
+            listType = null
+        }
+    }
+
+    const parseInlinePrint = (text) => {
+        if (!text) return ''
+        let res = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+        
+        res = res.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/gi, '<u>$1</u>')
+        res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        res = res.replace(/\*(.*?)\*/g, '<em>$1</em>')
+        res = res.replace(/~~(.*?)~~/g, '<del>$1</del>')
+        res = res.replace(/`([^`]+)`/g, '<code>$1</code>')
+        res = res.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 4pt; margin: 8pt 0;" />')
+        res = res.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        return res
+    }
+
+    const flushTable = () => {
+        if (tableBuffer.length === 0) return
+        const headerRow = tableBuffer[0]
+        const dataRows = tableBuffer.slice(2)
+        html += '<div class="table-container"><table><thead><tr>'
+        for (const cell of headerRow) {
+            html += `<th>${parseInlinePrint(cell)}</th>`
+        }
+        html += '</tr></thead><tbody>'
+        for (const row of dataRows) {
+            html += '<tr>'
+            for (const cell of row) {
+                html += `<td>${parseInlinePrint(cell)}</td>`
+            }
+            html += '</tr>'
+        }
+        html += '</tbody></table></div>\n'
+        tableBuffer = []
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+
+        if (line.trim().startsWith('```')) {
+            flushList()
+            flushTable()
+            if (inCodeBlock) {
+                const escaped = codeBuffer.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                html += `<pre><code class="lang-${codeLang}">${escaped}</code></pre>\n`
+                codeBuffer = []
+                codeLang = ''
+                inCodeBlock = false
+            } else {
+                inCodeBlock = true
+                codeLang = line.trim().slice(3).trim()
+            }
+            continue
+        }
+
+        if (inCodeBlock) {
+            codeBuffer.push(line)
+            continue
+        }
+
+        if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+            flushList()
+            const cells = line.split('|').slice(1, -1).map(c => c.trim())
+            tableBuffer.push(cells)
+            continue
+        } else {
+            flushTable()
+        }
+
+        if (/^(\*\*\*|---|___)$/.test(line.trim())) {
+            flushList()
+            html += '<hr />\n'
+            continue
+        }
+
+        if (line.startsWith('# ')) {
+            flushList()
+            html += `<h1>${parseInlinePrint(line.slice(2))}</h1>\n`
+            continue
+        }
+        if (line.startsWith('## ')) {
+            flushList()
+            html += `<h2>${parseInlinePrint(line.slice(3))}</h2>\n`
+            continue
+        }
+        if (line.startsWith('### ')) {
+            flushList()
+            html += `<h3>${parseInlinePrint(line.slice(4))}</h3>\n`
+            continue
+        }
+        if (line.startsWith('#### ')) {
+            flushList()
+            html += `<h4>${parseInlinePrint(line.slice(5))}</h4>\n`
+            continue
+        }
+
+        if (line.startsWith('> ')) {
+            flushList()
+            html += `<blockquote>${parseInlinePrint(line.slice(2))}</blockquote>\n`
+            continue
+        }
+
+        const taskMatch = line.match(/^(\s*)[-*]\s*\[([ xX])\]\s*(.*)$/)
+        if (taskMatch) {
+            flushList()
+            const isChecked = taskMatch[2].toLowerCase() === 'x'
+            const itemText = taskMatch[3]
+            html += `<div class="task-item ${isChecked ? 'task-done' : ''}">`
+            html += `<span class="checkbox ${isChecked ? 'checked' : ''}">${isChecked ? '✓' : ''}</span>`
+            html += `<span>${parseInlinePrint(itemText)}</span></div>\n`
+            continue
+        }
+
+        const bulletMatch = line.match(/^(\s*)[-*+]\s+(.*)$/)
+        if (bulletMatch) {
+            if (!inList || listType !== 'ul') {
+                flushList()
+                inList = true
+                listType = 'ul'
+                html += '<ul>\n'
+            }
+            html += `<li>${parseInlinePrint(bulletMatch[2])}</li>\n`
+            continue
+        }
+
+        const numMatch = line.match(/^(\s*)\d+\.\s+(.*)$/)
+        if (numMatch) {
+            if (!inList || listType !== 'ol') {
+                flushList()
+                inList = true
+                listType = 'ol'
+                html += '<ol>\n'
+            }
+            html += `<li>${parseInlinePrint(numMatch[2])}</li>\n`
+            continue
+        }
+
+        if (!line.trim()) {
+            flushList()
+            continue
+        }
+
+        flushList()
+        html += `<p>${parseInlinePrint(line)}</p>\n`
+    }
+
+    flushList()
+    flushTable()
+
+    const firstLineWithContent = lines.find(l => l.trim().length > 0) || ''
+    const heading1Match = firstLineWithContent.match(/^#\s+(.*)$/)
+    const hasMatchingH1 = heading1Match && heading1Match[1].trim().toLowerCase() === cleanTitle.toLowerCase()
+
+    const headerHtml = hasMatchingH1 ? '' : `<div class="document-header"><h1 class="document-title">${cleanTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h1></div>`
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>${cleanTitle.replace(/"/g, '&quot;')}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 16mm 20mm 16mm;
+        }
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #111827;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .document-header {
+            margin-bottom: 20pt;
+            padding-bottom: 10pt;
+            border-bottom: 2pt solid #e5e7eb;
+        }
+        .document-title {
+            font-size: 22pt;
+            font-weight: 800;
+            color: #111827;
+            margin: 0;
+            line-height: 1.25;
+        }
+        h1, h2, h3, h4 {
+            color: #111827;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+        h1 {
+            font-size: 18pt;
+            font-weight: 700;
+            margin: 18pt 0 8pt 0;
+            padding-bottom: 4pt;
+            border-bottom: 1pt solid #e5e7eb;
+        }
+        h2 {
+            font-size: 14pt;
+            font-weight: 600;
+            margin: 14pt 0 6pt 0;
+            padding-bottom: 3pt;
+            border-bottom: 1pt solid #f3f4f6;
+        }
+        h3 {
+            font-size: 12pt;
+            font-weight: 600;
+            margin: 12pt 0 4pt 0;
+        }
+        h4 {
+            font-size: 11pt;
+            font-weight: 600;
+            margin: 10pt 0 4pt 0;
+        }
+        p {
+            margin: 6pt 0;
+            text-align: justify;
+        }
+        strong {
+            font-weight: 700;
+            color: #000;
+        }
+        em {
+            font-style: italic;
+        }
+        del {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        u {
+            text-decoration: underline;
+        }
+        a {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+        blockquote {
+            margin: 10pt 0;
+            padding: 6pt 12pt;
+            border-left: 3pt solid #0284c7;
+            background: #f8fafc;
+            color: #475569;
+            font-style: italic;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        ul, ol {
+            margin: 6pt 0;
+            padding-left: 20pt;
+        }
+        li {
+            margin: 3pt 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin: 4pt 0;
+            font-size: 10.5pt;
+        }
+        .checkbox {
+            display: inline-block;
+            width: 12pt;
+            height: 12pt;
+            border: 1.5pt solid #6b7280;
+            border-radius: 2pt;
+            margin-right: 6pt;
+            text-align: center;
+            line-height: 11pt;
+            font-size: 9pt;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .checkbox.checked {
+            background-color: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+        }
+        .task-done {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        pre {
+            background: #f8fafc;
+            border: 1pt solid #e2e8f0;
+            border-radius: 4pt;
+            padding: 8pt 10pt;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 9pt;
+            line-height: 1.45;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin: 8pt 0;
+        }
+        code {
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 9.5pt;
+            background: #f1f5f9;
+            padding: 1pt 3pt;
+            border-radius: 2pt;
+            border: 0.5pt solid #e2e8f0;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            border: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12pt 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            font-size: 10pt;
+        }
+        th, td {
+            border: 1pt solid #cbd5e1;
+            padding: 6pt 8pt;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        hr {
+            border: 0;
+            border-top: 1pt solid #e2e8f0;
+            margin: 14pt 0;
+        }
+    </style>
+</head>
+<body>
+    ${headerHtml}
+    <div class="document-body">
+        ${html || '<p style="color: #9ca3af; font-style: italic;">(Document vide)</p>'}
+    </div>
+</body>
+</html>`
+}
 
 export default function Editor() {
     const { user } = useAuth()
@@ -195,18 +569,6 @@ export default function Editor() {
         }
     }, [user])
 
-    // Keyboard shortcut: Ctrl+S / Cmd+S
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault()
-                if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-                performSave()
-            }
-        }
-        window.addEventListener('keydown', handleKeyDown)
-        return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [performSave])
 
     // Handlers for Input Changes
     const handleTitleChange = (e) => {
@@ -377,9 +739,61 @@ export default function Editor() {
         URL.revokeObjectURL(url)
     }
 
-    const handlePrint = () => {
-        window.print()
-    }
+    const handlePrint = useCallback(() => {
+        const docTitle = (titleRef.current || 'Document sans titre').trim()
+        const docContent = contentRef.current || ''
+
+        const printHtml = generatePrintHtml(docTitle, docContent)
+
+        // Remove old iframe if any
+        const oldFrame = document.getElementById('todo-print-frame')
+        if (oldFrame) {
+            oldFrame.remove()
+        }
+
+        const iframe = document.createElement('iframe')
+        iframe.id = 'todo-print-frame'
+        iframe.style.position = 'fixed'
+        iframe.style.right = '0'
+        iframe.style.bottom = '0'
+        iframe.style.width = '0'
+        iframe.style.height = '0'
+        iframe.style.border = '0'
+        iframe.style.zIndex = '-9999'
+        iframe.style.opacity = '0'
+        document.body.appendChild(iframe)
+
+        const pri = iframe.contentWindow
+        pri.document.open()
+        pri.document.write(printHtml)
+        pri.document.close()
+
+        pri.focus()
+        setTimeout(() => {
+            try {
+                pri.print()
+            } catch (err) {
+                console.error('Erreur impression:', err)
+            }
+        }, 250)
+    }, [])
+
+    // Keyboard shortcuts: Ctrl+S (Save), Ctrl+P (Print)
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault()
+                if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+                performSave()
+            }
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+                e.preventDefault()
+                handlePrint()
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [performSave, handlePrint])
 
     // Metrics calculations
     const wordsCount = content.trim() ? content.trim().split(/\s+/).length : 0
@@ -714,7 +1128,7 @@ export default function Editor() {
                                 <button
                                     type="button"
                                     onClick={handlePrint}
-                                    title="Imprimer / Exporter en PDF"
+                                    title="Imprimer le document (Ctrl+P)"
                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
                                 >
                                     <Printer className="w-4 h-4" />
