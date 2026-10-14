@@ -91,6 +91,7 @@ export default function App() {
         name: nomNettoye,
         description,
         dueDate,
+        priority,
         attachment,
         attachmentName
       })
@@ -280,7 +281,16 @@ export default function App() {
                       >
                         {t.name}
                       </h3>
-                      {t.priority === 'high' && <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400 uppercase tracking-wide">Urgent</span>}
+                      {(() => {
+                        const p = t.priority || 'medium';
+                        if (p === 'high') {
+                          return <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400 uppercase tracking-wide border border-red-200 dark:border-red-900/40">Haute</span>
+                        }
+                        if (p === 'low') {
+                          return <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400 uppercase tracking-wide border border-blue-200 dark:border-blue-900/40">Basse</span>
+                        }
+                        return <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 uppercase tracking-wide border border-amber-200 dark:border-amber-900/40">Moyenne</span>
+                      })()}
                     </div>
                     {(() => {
                       const displayDate = (t.dueDate || t.due_date || '').split('T')[0].split(' ')[0]

@@ -42,6 +42,7 @@ exports.getTasks = async (req, res) => {
         const [tasks] = await db.execute(query, [req.userId]);
         const formattedTasks = tasks.map(t => ({
             ...t,
+            priority: t.priority || 'medium',
             dueDate: formatDueDate(t.due_date),
             dueTime: t.due_time,
             attachment: t.stored_name ? `/api/uploads/${t.stored_name}` : null,
@@ -57,16 +58,18 @@ exports.getTasks = async (req, res) => {
 
 exports.createTask = async (req, res) => {
     try {
-        const { name, description, status, dueDate, dueTime } = req.body;
+        const { name, description, status, priority, dueDate, dueTime } = req.body;
         const cleanDueDate = formatDueDate(dueDate);
+        const taskPriority = priority || 'medium';
         const [result] = await db.execute(
-            'INSERT INTO tasks (user_id, name, description, status, due_date, due_time) VALUES (?, ?, ?, ?, ?, ?)',
-            [req.userId, name, description || null, status || 'todo', cleanDueDate || null, dueTime || null]
+            'INSERT INTO tasks (user_id, name, description, status, priority, due_date, due_time) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [req.userId, name, description || null, status || 'todo', taskPriority, cleanDueDate || null, dueTime || null]
         );
         const [newTask] = await db.execute('SELECT * FROM tasks WHERE id = ?', [result.insertId]);
         const taskData = newTask[0] || {};
         res.status(201).json({
             ...taskData,
+            priority: taskData.priority || taskPriority,
             dueDate: formatDueDate(taskData.due_date) || cleanDueDate,
             dueTime: taskData.due_time || dueTime || null,
             attachment: null,
@@ -82,7 +85,7 @@ exports.createTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, status, dueDate, dueTime } = req.body;
+        const { name, description, status, priority, dueDate, dueTime } = req.body;
         
         const [task] = await db.execute('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [id, req.userId]);
         if (task.length === 0) {
@@ -93,13 +96,14 @@ exports.updateTask = async (req, res) => {
         const updatedName = name !== undefined ? name : current.name;
         const updatedDescription = description !== undefined ? description : current.description;
         const updatedStatus = status !== undefined ? status : current.status;
+        const updatedPriority = priority !== undefined ? priority : (current.priority || 'medium');
         const cleanDueDate = dueDate !== undefined ? (formatDueDate(dueDate) || null) : current.due_date;
         const updatedDueDate = cleanDueDate;
         const updatedDueTime = dueTime !== undefined ? (dueTime || null) : current.due_time;
 
         await db.execute(
-            'UPDATE tasks SET name = ?, description = ?, status = ?, due_date = ?, due_time = ? WHERE id = ?',
-            [updatedName, updatedDescription, updatedStatus, updatedDueDate, updatedDueTime, id]
+            'UPDATE tasks SET name = ?, description = ?, status = ?, priority = ?, due_date = ?, due_time = ? WHERE id = ?',
+            [updatedName, updatedDescription, updatedStatus, updatedPriority, updatedDueDate, updatedDueTime, id]
         );
         
         const [updatedTask] = await db.execute(`
@@ -117,6 +121,7 @@ exports.updateTask = async (req, res) => {
         const taskData = updatedTask[0] || {};
         res.json({
             ...taskData,
+            priority: taskData.priority || updatedPriority,
             dueDate: formatDueDate(taskData.due_date) || formatDueDate(updatedDueDate),
             dueTime: taskData.due_time || updatedDueTime,
             attachment: taskData.stored_name ? `/api/uploads/${taskData.stored_name}` : null,

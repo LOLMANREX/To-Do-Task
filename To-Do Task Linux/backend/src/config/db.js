@@ -38,11 +38,15 @@ const ensureTables = async () => {
                 name TEXT NOT NULL,
                 description TEXT,
                 status TEXT DEFAULT 'todo',
+                priority TEXT DEFAULT 'medium',
                 due_date DATE,
                 due_time TIME,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )
         `);
+        try {
+            await execute("ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium'");
+        } catch (_) {}
         await execute(`
             CREATE TABLE IF NOT EXISTS documents (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

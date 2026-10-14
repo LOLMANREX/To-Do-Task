@@ -31,6 +31,15 @@ const ensureDatabase = async () => {
     }
 
     try {
+        const [taskCols] = await pool.query('SHOW COLUMNS FROM tasks');
+        const taskNames = taskCols.map(c => c.Field);
+        if (!taskNames.includes('priority')) {
+            await pool.query("ALTER TABLE tasks ADD COLUMN priority VARCHAR(20) DEFAULT 'medium'");
+        }
+    } catch (e) {
+    }
+
+    try {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS notes (
                 id INT AUTO_INCREMENT PRIMARY KEY,

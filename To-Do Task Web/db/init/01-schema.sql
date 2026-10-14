@@ -13,6 +13,7 @@ CREATE TABLE tasks (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) DEFAULT 'todo',
+    priority VARCHAR(20) DEFAULT 'medium',
     due_date DATE,
     due_time TIME,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

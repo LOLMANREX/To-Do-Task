@@ -17,6 +17,9 @@ export default function Agenda() {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [status, setStatus] = useState('todo')
+    const [priority, setPriority] = useState('medium')
+    const [attachment, setAttachment] = useState(null)
+    const [attachmentName, setAttachmentName] = useState(null)
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -47,6 +50,30 @@ export default function Agenda() {
     const getTaskDate = (task) => {
         if (!task) return null
         return normalizeDateStr(task.dueDate || task.due_date)
+    }
+
+    const getPriorityInfo = (p) => {
+        switch (p) {
+            case 'high':
+                return {
+                    label: 'Haute',
+                    dotClass: 'bg-red-500',
+                    badgeClass: 'bg-red-500/15 text-red-700 dark:text-red-300 border-red-500/30'
+                }
+            case 'low':
+                return {
+                    label: 'Basse',
+                    dotClass: 'bg-blue-500',
+                    badgeClass: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30'
+                }
+            case 'medium':
+            default:
+                return {
+                    label: 'Moyenne',
+                    dotClass: 'bg-amber-500',
+                    badgeClass: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                }
+        }
     }
 
     const loadTasks = async () => {
@@ -94,6 +121,9 @@ export default function Agenda() {
         setTitle('')
         setDescription('')
         setStatus('todo')
+        setPriority('medium')
+        setAttachment(null)
+        setAttachmentName(null)
         setError('')
         setModalOpen(true)
     }
@@ -105,6 +135,9 @@ export default function Agenda() {
         setTitle(task.name || '')
         setDescription(task.description || '')
         setStatus(task.status || 'todo')
+        setPriority(task.priority || 'medium')
+        setAttachment(task.attachment || null)
+        setAttachmentName(task.attachmentName || null)
         setError('')
         setModalOpen(true)
     }
@@ -129,24 +162,28 @@ export default function Agenda() {
             if (editingTaskId) {
                 const current = tasks.find((t) => t.id === editingTaskId)
                 const targetStatus = status || current?.status || 'todo'
+                const targetPriority = priority || current?.priority || 'medium'
                 const updated = await taskService.updateTask(editingTaskId, {
                     name: cleanTitle,
                     description,
                     dueDate: selectedDate,
                     dueTime: time,
-                    status: targetStatus
+                    status: targetStatus,
+                    priority: targetPriority
                 })
-                setTasks((prev) => prev.map((t) => (t.id === editingTaskId ? { ...t, ...updated, dueDate: selectedDate, status: targetStatus } : t)))
+                setTasks((prev) => prev.map((t) => (t.id === editingTaskId ? { ...t, ...updated, dueDate: selectedDate, status: targetStatus, priority: targetPriority } : t)))
             } else {
+                const targetPriority = priority || 'medium'
                 const created = await taskService.createTask({
                     userId: user.id,
                     name: cleanTitle,
                     description,
                     dueDate: selectedDate,
                     dueTime: time,
-                    status: status || 'todo'
+                    status: status || 'todo',
+                    priority: targetPriority
                 })
-                setTasks((prev) => [{ ...created, dueDate: selectedDate, status: status || 'todo' }, ...prev])
+                setTasks((prev) => [{ ...created, dueDate: selectedDate, status: status || 'todo', priority: targetPriority }, ...prev])
             }
             setModalOpen(false)
         } catch (err) {
@@ -179,7 +216,7 @@ export default function Agenda() {
                         Agenda
                     </h1>
                     <p className={`mt-1.5 text-sm sm:text-base font-medium ${isGlass ? 'text-zinc-700 dark:text-zinc-300 drop-shadow-sm' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                        Consultez et planifiez vos événements et échéances sur le calendrier.
+                        Consultez et planifiez vos événements, tâches et priorités sur le calendrier.
                     </p>
                 </div>
 
@@ -224,7 +261,7 @@ export default function Agenda() {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-7 auto-rows-[125px]">
+                <div className="grid grid-cols-7 auto-rows-[140px] sm:auto-rows-[150px]">
                     {days.map((day, idx) => {
                         if (!day) {
                             return (
@@ -249,7 +286,7 @@ export default function Agenda() {
                             <div
                                 key={dateStr}
                                 onClick={() => handleOpenCreate(dateStr)}
-                                className="p-2.5 border-r border-b border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-1 overflow-y-auto hover:bg-zinc-100/40 dark:hover:bg-zinc-800/30 transition cursor-pointer"
+                                className="p-2 border-r border-b border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-1 overflow-y-auto hover:bg-zinc-100/40 dark:hover:bg-zinc-800/30 transition cursor-pointer"
                             >
                                 <div className="flex items-center justify-between">
                                     <span
@@ -262,11 +299,12 @@ export default function Agenda() {
                                     </span>
                                 </div>
 
-                                <div className="space-y-1 mt-1">
+                                <div className="space-y-1.5 mt-1">
                                     {dayTasks.map((t) => {
                                         const taskTime = t.dueTime || t.due_time
                                         const isDone = t.status === 'done'
                                         const isInProgress = t.status === 'in_progress'
+                                        const prio = getPriorityInfo(t.priority)
                                         return (
                                             <div
                                                 key={t.id}
@@ -274,26 +312,57 @@ export default function Agenda() {
                                                     e.stopPropagation()
                                                     handleOpenEdit(t)
                                                 }}
-                                                className={`px-2 py-1 text-[10px] font-semibold rounded-lg truncate border transition cursor-pointer flex items-center gap-1.5 ${
+                                                className={`p-1.5 text-[10px] rounded-lg border transition-all cursor-pointer flex flex-col gap-1 shadow-xs hover:shadow-sm ${
                                                     isDone
-                                                        ? 'bg-zinc-100/70 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 line-through'
+                                                        ? 'bg-zinc-100/70 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 line-through opacity-75'
                                                         : isInProgress
-                                                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400'
-                                                        : 'bg-zinc-100/60 hover:bg-zinc-200/60 dark:bg-zinc-900/80 dark:hover:bg-zinc-800 border-zinc-200/80 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200'
+                                                        ? 'bg-amber-500/10 hover:bg-amber-500/15 border-amber-500/30 text-zinc-900 dark:text-zinc-100'
+                                                        : 'bg-white/80 hover:bg-white dark:bg-zinc-900/90 dark:hover:bg-zinc-800 border-zinc-200/80 dark:border-zinc-700/80 text-zinc-900 dark:text-zinc-100'
                                                 }`}
-                                                title={`${t.name}${taskTime ? ' à ' + taskTime : ''}${t.description ? ' - ' + t.description : ''}`}
+                                                title={`${t.name} • Priorité : ${prio.label}${taskTime ? ' à ' + taskTime : ''}${t.description ? ' • ' + t.description : ''}`}
                                             >
-                                                <span
-                                                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                                        isDone
-                                                            ? 'bg-emerald-500'
-                                                            : isInProgress
-                                                            ? 'bg-amber-500'
-                                                            : 'bg-blue-500'
-                                                    }`}
-                                                />
-                                                {taskTime && <span className="font-mono text-zinc-500 shrink-0">{taskTime}</span>}
-                                                <span className="truncate">{t.name}</span>
+                                                <div className="flex items-center justify-between gap-1">
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <span
+                                                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                                                isDone
+                                                                    ? 'bg-emerald-500'
+                                                                    : isInProgress
+                                                                    ? 'bg-amber-500'
+                                                                    : 'bg-blue-500'
+                                                            }`}
+                                                        />
+                                                        <span className="truncate font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</span>
+                                                    </div>
+                                                    {taskTime && (
+                                                        <span className="font-mono text-[9px] text-zinc-500 dark:text-zinc-400 shrink-0 font-medium">
+                                                            {taskTime}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center justify-between gap-1 pt-0.5">
+                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-tight border ${prio.badgeClass}`}>
+                                                        {prio.label}
+                                                    </span>
+                                                    <div className="flex items-center gap-1 truncate text-[9px]">
+                                                        {isInProgress && (
+                                                            <span className="text-amber-600 dark:text-amber-400 font-medium">
+                                                                En cours
+                                                            </span>
+                                                        )}
+                                                        {isDone && (
+                                                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                                                                Fait
+                                                            </span>
+                                                        )}
+                                                        {t.attachment && (
+                                                            <span title="Pièce jointe présente" className="text-zinc-400">
+                                                                📎
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         )
                                     })}
@@ -373,19 +442,36 @@ export default function Agenda() {
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                                    Statut
-                                </label>
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition cursor-pointer"
-                                >
-                                    <option value="todo">À faire</option>
-                                    <option value="in_progress">En cours</option>
-                                    <option value="done">Terminée</option>
-                                </select>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Priorité
+                                    </label>
+                                    <select
+                                        value={priority}
+                                        onChange={(e) => setPriority(e.target.value)}
+                                        className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition cursor-pointer"
+                                    >
+                                        <option value="low">Basse</option>
+                                        <option value="medium">Moyenne</option>
+                                        <option value="high">Haute</option>
+                                    </select>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Statut
+                                    </label>
+                                    <select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                        className="w-full h-10 px-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition cursor-pointer"
+                                    >
+                                        <option value="todo">À faire</option>
+                                        <option value="in_progress">En cours</option>
+                                        <option value="done">Terminée</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="space-y-1">
@@ -400,6 +486,24 @@ export default function Agenda() {
                                     className="w-full p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 text-sm text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition resize-none"
                                 />
                             </div>
+
+                            {attachment && (
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                                        Pièce jointe
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <a
+                                            href={attachment}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition text-xs font-medium text-blue-600 dark:text-blue-400"
+                                        >
+                                            📎 {attachmentName || 'Consulter le fichier'}
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="flex items-center justify-between pt-2">
                                 {editingTaskId ? (
