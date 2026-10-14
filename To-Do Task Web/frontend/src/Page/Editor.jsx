@@ -4,7 +4,7 @@ import {
     Columns2, Eye, Edit3, Check, Loader2, Printer, ChevronLeft,
     Bold, Italic, Underline, Strikethrough, Heading1, Heading2, Heading3,
     List, ListOrdered, CheckSquare, Quote, Code, Minus, Calendar, ExternalLink,
-    PanelLeftClose, PanelLeftOpen
+    PanelLeftClose, PanelLeftOpen, FileUp, X
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -412,6 +412,15 @@ export default function Editor() {
     const [showDocSidebar, setShowDocSidebar] = useState(true)
     const [showMobileList, setShowMobileList] = useState(true)
 
+    // PDF Import states
+    const pdfInputRef = useRef(null)
+    const [isConvertingPdf, setIsConvertingPdf] = useState(false)
+    const [pdfProgress, setPdfProgress] = useState({ percentage: 0, message: '' })
+    const [pendingPdfFile, setPendingPdfFile] = useState(null)
+    const [showPdfChoiceModal, setShowPdfChoiceModal] = useState(false)
+    const [isDraggingPdf, setIsDraggingPdf] = useState(false)
+    const [pdfNotice, setPdfNotice] = useState(null)
+
     const textareaRef = useRef(null)
     const saveTimerRef = useRef(null)
     const activeNoteIdRef = useRef(activeNoteId)
@@ -795,6 +804,81 @@ export default function Editor() {
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [performSave, handlePrint])
 
+    // PDF to Markdown Import handlers
+    const handlePdfFile = async (file) => {
+        if (!file) return
+        if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+            setPdfNotice({
+                type: 'error',
+                message: 'Veuillez sélectionner un fichier au format PDF valide (.pdf).'
+            })
+            setTimeout(() => setPdfNotice(null), 5000)
+            return
+        }
+
+        // If current note has content, ask how to import
+        if (activeNoteId && content.trim().length > 0) {
+            setPendingPdfFile(file)
+            setShowPdfChoiceModal(true)
+        } else {
+            await executePdfImport(file, activeNoteId && content.trim().length === 0 ? 'replace' : 'new')
+        }
+    }
+
+    const executePdfImport = async (file, mode = 'new') => {
+        setShowPdfChoiceModal(false)
+        setIsConvertingPdf(true)
+        setPdfProgress({ percentage: 5, message: 'Initialisation de l\'import PDF...' })
+        setPdfNotice(null)
+
+        try {
+            const { convertPdfToMarkdown } = await import('@/services/pdfToMarkdown')
+            const result = await convertPdfToMarkdown(file, {
+                onProgress: ({ percentage, message }) => {
+                    setPdfProgress({ percentage, message })
+                }
+            })
+
+            const importedMarkdown = result.markdown
+            const cleanTitle = result.title || file.name.replace(/\.[^/.]+$/, '')
+
+            if (mode === 'new' || !activeNoteId) {
+                const newDoc = await noteService.createNote({
+                    title: cleanTitle,
+                    content: importedMarkdown
+                })
+                setNotes(prev => [newDoc, ...prev])
+                selectNote(newDoc, user?.id)
+                if (isMobile) setShowMobileList(false)
+            } else if (mode === 'append') {
+                const updated = content.trim() ? `${content}\n\n---\n\n${importedMarkdown}` : importedMarkdown
+                setContent(updated)
+                triggerAutoSave()
+            } else if (mode === 'replace') {
+                setTitle(cleanTitle)
+                setContent(importedMarkdown)
+                triggerAutoSave()
+            }
+
+            setPdfNotice({
+                type: 'success',
+                message: `PDF converti avec succès en Markdown (${result.pageCount} page${result.pageCount > 1 ? 's' : ''}, ${result.wordCount} mots) !`
+            })
+            setTimeout(() => setPdfNotice(null), 6000)
+        } catch (err) {
+            console.error('Erreur conversion PDF:', err)
+            setPdfNotice({
+                type: 'error',
+                message: err.message || 'Échec de la conversion du PDF en Markdown.'
+            })
+            setTimeout(() => setPdfNotice(null), 7000)
+        } finally {
+            setIsConvertingPdf(false)
+            setPendingPdfFile(null)
+            if (pdfInputRef.current) pdfInputRef.current.value = ''
+        }
+    }
+
     // Metrics calculations
     const wordsCount = content.trim() ? content.trim().split(/\s+/).length : 0
     const charsCount = content.length
@@ -833,6 +917,29 @@ export default function Editor() {
                 </div>
 
                 <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <input
+                        ref={pdfInputRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        className="hidden"
+                        onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                                handlePdfFile(e.target.files[0])
+                            }
+                        }}
+                    />
+
+                    <button
+                        type="button"
+                        onClick={() => pdfInputRef.current?.click()}
+                        disabled={isConvertingPdf}
+                        className="flex items-center gap-2 h-10 px-3.5 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                        title="Convertir et importer un document PDF en Markdown"
+                    >
+                        <FileUp className="w-4 h-4 text-sky-500 stroke-[2.2]" />
+                        <span>Importer un PDF</span>
+                    </button>
+
                     <button
                         type="button"
                         onClick={handleCreateNote}
@@ -845,7 +952,25 @@ export default function Editor() {
             </div>
 
             {/* Main Application Area */}
-            <div className={`flex-1 rounded-2xl overflow-hidden border ${currentContainerClass} flex flex-col lg:flex-row min-h-[680px]`}>
+            <div
+                onDragOver={(e) => {
+                    e.preventDefault()
+                    if (!isDraggingPdf) setIsDraggingPdf(true)
+                }}
+                onDragLeave={(e) => {
+                    e.preventDefault()
+                    setIsDraggingPdf(false)
+                }}
+                onDrop={(e) => {
+                    e.preventDefault()
+                    setIsDraggingPdf(false)
+                    const file = e.dataTransfer?.files?.[0]
+                    if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
+                        handlePdfFile(file)
+                    }
+                }}
+                className={`relative flex-1 rounded-2xl overflow-hidden border ${currentContainerClass} flex flex-col lg:flex-row min-h-[680px]`}
+            >
                 {/* Left Sidebar: Document List */}
                 <div className={`w-full lg:w-56 xl:w-60 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800/80 flex flex-col shrink-0 transition-all ${
                     !showDocSidebar ? 'hidden' : isMobile && !showMobileList ? 'hidden' : 'flex'
@@ -964,14 +1089,25 @@ export default function Editor() {
                             <p className="text-sm max-w-sm text-zinc-500 dark:text-zinc-400 mb-5">
                                 Vous n'avez aucun document ouvert. Créez un nouveau document pour commencer à rédiger.
                             </p>
-                            <button
-                                type="button"
-                                onClick={handleCreateNote}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-sky-500 hover:bg-sky-600 active:scale-95 text-white shadow-md shadow-sky-500/20 transition-all cursor-pointer"
-                            >
-                                <Plus className="w-4 h-4 stroke-[2.5]" />
-                                Nouveau document
-                            </button>
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleCreateNote}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-sky-500 hover:bg-sky-600 active:scale-95 text-white shadow-md shadow-sky-500/20 transition-all cursor-pointer"
+                                >
+                                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                                    Nouveau document
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => pdfInputRef.current?.click()}
+                                    disabled={isConvertingPdf}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                                >
+                                    <FileUp className="w-4 h-4 text-sky-500 stroke-[2.2]" />
+                                    Importer un PDF
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <>
@@ -1111,6 +1247,15 @@ export default function Editor() {
                             <div className="flex items-center gap-1">
                                 <button
                                     type="button"
+                                    onClick={() => pdfInputRef.current?.click()}
+                                    disabled={isConvertingPdf}
+                                    title="Importer un PDF dans ce document"
+                                    className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-700 transition-colors cursor-pointer"
+                                >
+                                    <FileUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                    type="button"
                                     onClick={handleCopyAll}
                                     title="Copier tout le contenu"
                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
@@ -1136,6 +1281,31 @@ export default function Editor() {
                             </div>
                         </div>
                     </div>
+
+                    {/* PDF Notification Alert */}
+                    {pdfNotice && (
+                        <div className={`px-4 py-2.5 border-b text-xs font-medium flex items-center justify-between gap-3 animate-in slide-in-from-top-1 duration-200 ${
+                            pdfNotice.type === 'success'
+                                ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-800 dark:text-emerald-300'
+                                : 'bg-rose-500/10 border-rose-500/25 text-rose-800 dark:text-rose-300'
+                        }`}>
+                            <div className="flex items-center gap-2">
+                                {pdfNotice.type === 'success' ? (
+                                    <Check className="w-4 h-4 shrink-0 text-emerald-500" />
+                                ) : (
+                                    <FileText className="w-4 h-4 shrink-0 text-rose-500" />
+                                )}
+                                <span>{pdfNotice.message}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setPdfNotice(null)}
+                                className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer text-zinc-500"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    )}
 
                     {/* Rich Formatting Toolbar */}
                     {editorViewMode !== 'preview' && (
@@ -1326,7 +1496,152 @@ export default function Editor() {
                         </>
                     )}
                 </div>
+
+                {/* Drag & Drop Visual Indicator Overlay */}
+                {isDraggingPdf && (
+                    <div className="absolute inset-0 z-40 bg-sky-500/10 dark:bg-sky-500/15 backdrop-blur-xs border-2 border-dashed border-sky-500 rounded-2xl flex flex-col items-center justify-center pointer-events-none animate-in fade-in duration-150">
+                        <div className="p-6 rounded-2xl bg-white/95 dark:bg-zinc-900/95 shadow-2xl border border-sky-400/40 text-center space-y-2">
+                            <FileUp className="w-10 h-10 text-sky-500 mx-auto animate-bounce" />
+                            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                Déposez votre document PDF ici
+                            </p>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                Conversion automatique en Markdown structuré
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* PDF Import Choice Modal */}
+            {showPdfChoiceModal && pendingPdfFile && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className={`w-full max-w-md rounded-2xl p-6 space-y-4 ${
+                        isGlass
+                            ? 'bg-white/95 dark:bg-zinc-900/95 backdrop-blur-3xl border border-white/80 dark:border-white/20 shadow-2xl'
+                            : 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl'
+                    }`}>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-600 dark:text-sky-400">
+                                    <FileUp className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+                                        Importer le PDF en Markdown
+                                    </h2>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[260px] font-medium">
+                                        {pendingPdfFile.name} ({Math.round(pendingPdfFile.size / 1024)} Ko)
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => { setShowPdfChoiceModal(false); setPendingPdfFile(null); }}
+                                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                            Vous avez déjà un document ouvert avec du contenu. Comment souhaitez-vous intégrer ce fichier PDF ?
+                        </p>
+
+                        <div className="space-y-2 pt-1">
+                            <button
+                                type="button"
+                                onClick={() => executePdfImport(pendingPdfFile, 'new')}
+                                className="w-full p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-sky-500 dark:hover:border-sky-500 hover:bg-sky-50/50 dark:hover:bg-sky-950/20 text-left transition-all cursor-pointer flex items-center justify-between group"
+                            >
+                                <div>
+                                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                                        📄 Créer un nouveau document
+                                    </div>
+                                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        Crée une nouvelle note avec le texte et la mise en page du PDF.
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => executePdfImport(pendingPdfFile, 'append')}
+                                className="w-full p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-sky-500 dark:hover:border-sky-500 hover:bg-sky-50/50 dark:hover:bg-sky-950/20 text-left transition-all cursor-pointer flex items-center justify-between group"
+                            >
+                                <div>
+                                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                                        ➕ Insérer à la suite du document actuel
+                                    </div>
+                                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        Ajoute le contenu converti à la fin de cette note.
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => executePdfImport(pendingPdfFile, 'replace')}
+                                className="w-full p-3 rounded-xl border border-red-200/80 dark:border-red-900/40 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-50/50 dark:hover:bg-red-950/20 text-left transition-all cursor-pointer flex items-center justify-between group"
+                            >
+                                <div>
+                                    <div className="text-xs font-bold text-red-600 dark:text-red-400">
+                                        ⚠️ Remplacer le document actuel
+                                    </div>
+                                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        Écrase le contenu de la note actuelle avec le contenu du PDF.
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="flex justify-end pt-1">
+                            <button
+                                type="button"
+                                onClick={() => { setShowPdfChoiceModal(false); setPendingPdfFile(null); }}
+                                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition"
+                            >
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* PDF Conversion Progress Modal */}
+            {isConvertingPdf && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className={`w-full max-w-sm rounded-2xl p-6 text-center space-y-4 ${
+                        isGlass
+                            ? 'bg-white/95 dark:bg-zinc-900/95 backdrop-blur-3xl border border-white/80 dark:border-white/20 shadow-2xl'
+                            : 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl'
+                    }`}>
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-sky-500/15 flex items-center justify-center text-sky-500 animate-pulse">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        </div>
+
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                Conversion du PDF en Markdown
+                            </h3>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                {pdfProgress.message || 'Analyse et extraction en cours...'}
+                            </p>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                            <div
+                                className="bg-sky-500 h-full rounded-full transition-all duration-300 ease-out"
+                                style={{ width: `${pdfProgress.percentage || 15}%` }}
+                            />
+                        </div>
+                        <div className="text-[10px] text-zinc-400 font-mono">
+                            {pdfProgress.percentage}%
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
