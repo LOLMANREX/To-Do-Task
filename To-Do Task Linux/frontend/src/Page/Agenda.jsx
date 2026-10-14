@@ -14,10 +14,34 @@ export default function Agenda() {
     const [time, setTime] = useState('')
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [status, setStatus] = useState('todo')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
     const todayStr = new Date().toISOString().split('T')[0]
+
+    const normalizeDateStr = (val) => {
+        if (!val) return null
+        if (typeof val === 'string') {
+            return val.split('T')[0].split(' ')[0]
+        }
+        if (val instanceof Date) {
+            try {
+                return val.toISOString().split('T')[0]
+            } catch (_) {
+                const y = val.getFullYear()
+                const m = String(val.getMonth() + 1).padStart(2, '0')
+                const d = String(val.getDate()).padStart(2, '0')
+                return `${y}-${m}-${d}`
+            }
+        }
+        return String(val)
+    }
+
+    const getTaskDate = (task) => {
+        if (!task) return null
+        return normalizeDateStr(task.dueDate || task.due_date)
+    }
 
     const loadTasks = async () => {
         if (!user) return
@@ -63,16 +87,18 @@ export default function Agenda() {
         setTime('')
         setTitle('')
         setDescription('')
+        setStatus('todo')
         setError('')
         setModalOpen(true)
     }
 
     const handleOpenEdit = (task) => {
         setEditingTaskId(task.id)
-        setSelectedDate(task.dueDate || todayStr)
-        setTime(task.dueTime || '')
-        setTitle(task.name)
+        setSelectedDate(getTaskDate(task) || todayStr)
+        setTime(task.dueTime || task.due_time || '')
+        setTitle(task.name || '')
         setDescription(task.description || '')
+        setStatus(task.status || 'todo')
         setError('')
         setModalOpen(true)
     }
@@ -96,23 +122,25 @@ export default function Agenda() {
         try {
             if (editingTaskId) {
                 const current = tasks.find((t) => t.id === editingTaskId)
+                const targetStatus = status || current?.status || 'todo'
                 const updated = await taskService.updateTask(editingTaskId, {
                     name: cleanTitle,
                     description,
                     dueDate: selectedDate,
                     dueTime: time,
-                    status: current?.status || 'todo'
+                    status: targetStatus
                 })
-                setTasks((prev) => prev.map((t) => (t.id === editingTaskId ? { ...t, ...updated } : t)))
+                setTasks((prev) => prev.map((t) => (t.id === editingTaskId ? { ...t, ...updated, dueDate: selectedDate, status: targetStatus } : t)))
             } else {
                 const created = await taskService.createTask({
                     userId: user.id,
                     name: cleanTitle,
                     description,
                     dueDate: selectedDate,
-                    dueTime: time
+                    dueTime: time,
+                    status: status || 'todo'
                 })
-                setTasks((prev) => [created, ...prev])
+                setTasks((prev) => [{ ...created, dueDate: selectedDate, status: status || 'todo' }, ...prev])
             }
             setModalOpen(false)
         } catch (err) {
@@ -206,8 +234,8 @@ export default function Agenda() {
                         const dateStr = `${y}-${m}-${dt}`
 
                         const dayTasks = tasks
-                            .filter((t) => t.dueDate === dateStr)
-                            .sort((a, b) => (a.dueTime || '').localeCompare(b.dueTime || ''))
+                            .filter((t) => getTaskDate(t) === dateStr)
+                            .sort((a, b) => (a.dueTime || a.due_time || '').localeCompare(b.dueTime || b.due_time || ''))
                         const isToday = todayStr === dateStr
 
                         return (
@@ -228,19 +256,40 @@ export default function Agenda() {
                                 </div>
 
                                 <div className="space-y-1 mt-1">
-                                    {dayTasks.map((t) => (
-                                        <div
-                                            key={t.id}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleOpenEdit(t)
-                                            }}
-                                            className="px-2 py-1 text-[10px] font-medium rounded truncate border bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 transition"
-                                        >
-                                            {t.dueTime && <span className="font-mono text-zinc-500 mr-1">{t.dueTime}</span>}
-                                            {t.name}
-                                        </div>
-                                    ))}
+                                    {dayTasks.map((t) => {
+                                        const taskTime = t.dueTime || t.due_time
+                                        const isDone = t.status === 'done'
+                                        const isInProgress = t.status === 'in_progress'
+                                        return (
+                                            <div
+                                                key={t.id}
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    handleOpenEdit(t)
+                                                }}
+                                                className={`px-2 py-1 text-[10px] font-medium rounded truncate border transition cursor-pointer flex items-center gap-1.5 ${
+                                                    isDone
+                                                        ? 'bg-zinc-100/70 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 line-through'
+                                                        : isInProgress
+                                                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
+                                                        : 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200'
+                                                }`}
+                                                title={`${t.name}${taskTime ? ' à ' + taskTime : ''}${t.description ? ' - ' + t.description : ''}`}
+                                            >
+                                                <span
+                                                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                                        isDone
+                                                            ? 'bg-emerald-500'
+                                                            : isInProgress
+                                                            ? 'bg-amber-500'
+                                                            : 'bg-blue-500'
+                                                    }`}
+                                                />
+                                                {taskTime && <span className="font-mono text-zinc-500 shrink-0">{taskTime}</span>}
+                                                <span className="truncate">{t.name}</span>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         )
@@ -311,6 +360,21 @@ export default function Agenda() {
                                         className="w-full h-9 px-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                                    Statut
+                                </label>
+                                <select
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                    className="w-full h-9 px-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 outline-none cursor-pointer"
+                                >
+                                    <option value="todo">À faire</option>
+                                    <option value="in_progress">En cours</option>
+                                    <option value="done">Terminée</option>
+                                </select>
                             </div>
 
                             <div className="space-y-1">

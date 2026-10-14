@@ -11,14 +11,13 @@ export default function App() {
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState('')
+  const todayStr = new Date().toISOString().split('T')[0]
+  const [dueDate, setDueDate] = useState(todayStr)
   const [priority, setPriority] = useState('medium')
   const [formError, setFormError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [attachment, setAttachment] = useState(null)
   const [attachmentName, setAttachmentName] = useState(null)
-
-  const todayStr = new Date().toISOString().split('T')[0]
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
@@ -90,10 +89,11 @@ export default function App() {
         attachmentName
       })
       nouvelleTache.priority = priority
+      nouvelleTache.dueDate = dueDate
       setTasks((prev) => [nouvelleTache, ...prev])
       setName('')
       setDescription('')
-      setDueDate('')
+      setDueDate(todayStr)
       setPriority('medium')
       setAttachment(null)
       setAttachmentName(null)
@@ -267,12 +267,19 @@ export default function App() {
                       </h3>
                       {t.priority === 'high' && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 uppercase">Urgent</span>}
                     </div>
-                    <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-500 dark:text-zinc-500 font-medium">
-                      <span className={t.dueDate < todayStr && t.status !== 'done' ? 'text-red-500 font-bold' : ''}>
-                        📅 {t.dueDate}
-                      </span>
-                      {t.completedAt && <span> Fait le {t.completedAt.split('T')[0]}</span>}
-                    </div>
+                    {(() => {
+                      const displayDate = (t.dueDate || t.due_date || '').split('T')[0].split(' ')[0]
+                      return (
+                        <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-500 dark:text-zinc-500 font-medium">
+                          {displayDate && (
+                            <span className={displayDate < todayStr && t.status !== 'done' ? 'text-red-500 font-bold' : ''}>
+                              📅 {displayDate}
+                            </span>
+                          )}
+                          {t.completedAt && <span> Fait le {t.completedAt.split('T')[0]}</span>}
+                        </div>
+                      )
+                    })()}
                     {t.attachment && (() => {
                       const isImage = t.mimeType?.startsWith('image/') || 
                         /\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i.test(t.attachmentName || t.attachment) ||

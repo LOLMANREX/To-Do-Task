@@ -7,6 +7,24 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+const formatDueDate = (val) => {
+    if (!val) return null;
+    if (typeof val === 'string') {
+        return val.split('T')[0].split(' ')[0];
+    }
+    if (val instanceof Date) {
+        try {
+            return val.toISOString().split('T')[0];
+        } catch (_) {
+            const y = val.getFullYear();
+            const m = String(val.getMonth() + 1).padStart(2, '0');
+            const d = String(val.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+    }
+    return String(val);
+};
+
 exports.getTasks = async (req, res) => {
     try {
         const query = `
@@ -24,7 +42,7 @@ exports.getTasks = async (req, res) => {
         const [tasks] = await db.execute(query, [req.userId]);
         const formattedTasks = tasks.map(t => ({
             ...t,
-            dueDate: t.due_date,
+            dueDate: formatDueDate(t.due_date),
             dueTime: t.due_time,
             attachment: t.stored_name ? `/api/uploads/${t.stored_name}` : null,
             attachmentName: t.original_name || t.stored_name || null,
@@ -40,15 +58,17 @@ exports.getTasks = async (req, res) => {
 exports.createTask = async (req, res) => {
     try {
         const { name, description, status, dueDate, dueTime } = req.body;
+        const cleanDueDate = formatDueDate(dueDate);
         const [result] = await db.execute(
             'INSERT INTO tasks (user_id, name, description, status, due_date, due_time) VALUES (?, ?, ?, ?, ?, ?)',
-            [req.userId, name, description || null, status || 'todo', dueDate || null, dueTime || null]
+            [req.userId, name, description || null, status || 'todo', cleanDueDate || null, dueTime || null]
         );
         const [newTask] = await db.execute('SELECT * FROM tasks WHERE id = ?', [result.insertId]);
+        const taskData = newTask[0] || {};
         res.status(201).json({
-            ...newTask[0],
-            dueDate: newTask[0].due_date,
-            dueTime: newTask[0].due_time,
+            ...taskData,
+            dueDate: formatDueDate(taskData.due_date) || cleanDueDate,
+            dueTime: taskData.due_time || dueTime || null,
             attachment: null,
             attachmentName: null,
             mimeType: null
@@ -73,7 +93,8 @@ exports.updateTask = async (req, res) => {
         const updatedName = name !== undefined ? name : current.name;
         const updatedDescription = description !== undefined ? description : current.description;
         const updatedStatus = status !== undefined ? status : current.status;
-        const updatedDueDate = dueDate !== undefined ? (dueDate || null) : current.due_date;
+        const cleanDueDate = dueDate !== undefined ? (formatDueDate(dueDate) || null) : current.due_date;
+        const updatedDueDate = cleanDueDate;
         const updatedDueTime = dueTime !== undefined ? (dueTime || null) : current.due_time;
 
         await db.execute(
@@ -93,13 +114,14 @@ exports.updateTask = async (req, res) => {
             WHERE t.id = ?
         `, [id]);
         
+        const taskData = updatedTask[0] || {};
         res.json({
-            ...updatedTask[0],
-            dueDate: updatedTask[0].due_date,
-            dueTime: updatedTask[0].due_time,
-            attachment: updatedTask[0].stored_name ? `/api/uploads/${updatedTask[0].stored_name}` : null,
-            attachmentName: updatedTask[0].original_name || updatedTask[0].stored_name || null,
-            mimeType: updatedTask[0].mime_type || null
+            ...taskData,
+            dueDate: formatDueDate(taskData.due_date) || formatDueDate(updatedDueDate),
+            dueTime: taskData.due_time || updatedDueTime,
+            attachment: taskData.stored_name ? `/api/uploads/${taskData.stored_name}` : null,
+            attachmentName: taskData.original_name || taskData.stored_name || null,
+            mimeType: taskData.mime_type || null
         });
     } catch (error) {
         console.error('Error in updateTask:', error);
