@@ -3,6 +3,8 @@ import { PublicRoute } from './routes/PublicRoute'
 import { PrivateRoute } from './routes/PrivateRoute'
 import Login from './Page/Login'
 import Register from './Page/Register'
+import ForgotPassword from './Page/ForgotPassword'
+import ResetPassword from './Page/ResetPassword'
 import App from './Page/App'
 import Home from './Page/Home'
 import Settings from './Page/Settings'
@@ -16,7 +18,9 @@ export const router = createHashRouter([
         element: <PublicRoute />,
         children: [
             { path: '/login', element: <Login /> },
-            { path: '/register', element: <Register /> }
+            { path: '/register', element: <Register /> },
+            { path: '/forgot-password', element: <ForgotPassword /> },
+            { path: '/reset-password', element: <ResetPassword /> }
         ]
     },
     {

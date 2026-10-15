@@ -30,6 +30,13 @@ services:
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=${MYSQL_DATABASE}
       - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=${SMTP_HOST:-mailpit}
+      - SMTP_PORT=${SMTP_PORT:-1025}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@to-do-task.local}
+      - APP_URL=${APP_URL:-http://localhost}
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -67,6 +74,14 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     depends_on:
       - db
+    networks:
+      - app_network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - app_network
 

@@ -15,6 +15,10 @@ if (window.location.protocol === 'file:') {
     }
     return originalFetch(url, options);
   };
+} else {
+  if (window.location.pathname === '/reset-password' || window.location.pathname === '/forgot-password') {
+    window.location.replace('/#' + window.location.pathname + window.location.search);
+  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

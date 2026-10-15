@@ -93,6 +93,12 @@ export default function Login() {
                                 <label className="text-xs font-medium text-zinc-300" htmlFor="password">
                                     Mot de passe
                                 </label>
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors underline-offset-4 hover:underline"
+                                >
+                                    Mot de passe oublié ?
+                                </Link>
                             </div>
                             <input
                                 id="password"

@@ -56,6 +56,23 @@ const ensureDatabase = async () => {
     } catch (e) {
         console.error('Error ensuring notes table in web db:', e);
     }
+
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(255) NOT NULL,
+                code VARCHAR(10) NOT NULL,
+                token VARCHAR(255) NOT NULL,
+                expires_at DATETIME NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_pwd_resets_email (email),
+                INDEX idx_pwd_resets_token (token)
+            )
+        `);
+    } catch (e) {
+        console.error('Error ensuring password_resets table in web db:', e);
+    }
 };
 
 ensureDatabase();

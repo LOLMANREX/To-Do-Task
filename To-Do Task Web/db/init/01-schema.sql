@@ -41,3 +41,15 @@ CREATE TABLE notes (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_notes_user_id ON notes(user_id);
+
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    code VARCHAR(10) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_password_resets_email ON password_resets(email);
+CREATE INDEX idx_password_resets_token ON password_resets(token);
+

@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const db = require('../config/db');
+const emailService = require('../services/emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'todo_desktop_jwt_secret_fallback_key_2026';
 
@@ -177,3 +179,114 @@ exports.setAvatarPreset = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+function parseExpiration(raw) {
+    if (raw instanceof Date) return raw.getTime();
+    if (typeof raw === 'number') return raw;
+    const str = String(raw || '').trim();
+    if (!/[+-]\d{2}:?\d{2}$|Z$/.test(str)) {
+        return new Date(str.replace(' ', 'T') + 'Z').getTime();
+    }
+    return new Date(str).getTime();
+}
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || typeof email !== 'string') {
+            return res.status(400).json({ message: "L'adresse e-mail est requise." });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const [users] = await db.execute('SELECT id, email FROM users WHERE LOWER(email) = ?', [normalizedEmail]);
+
+        if (!users || users.length === 0) {
+            return res.json({
+                message: "Si un compte est associé à cette adresse e-mail, vous recevrez un code et un lien de réinitialisation sous peu."
+            });
+        }
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+
+        await db.execute('DELETE FROM password_resets WHERE LOWER(email) = ?', [normalizedEmail]);
+        await db.execute(
+            'INSERT INTO password_resets (email, code, token, expires_at) VALUES (?, ?, ?, ?)',
+            [normalizedEmail, code, token, expiresAt]
+        );
+
+        const defaultOrigin = req.headers.origin || (req.headers.host ? `${req.protocol || 'http'}://${req.headers.host}` : null);
+        const appUrl = process.env.APP_URL || defaultOrigin || 'http://localhost';
+        const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
+
+        await emailService.sendPasswordResetEmail({
+            to: normalizedEmail,
+            code,
+            resetUrl
+        });
+
+        res.json({
+            message: "Si un compte est associé à cette adresse e-mail, vous recevrez un code et un lien de réinitialisation sous peu."
+        });
+    } catch (error) {
+        console.error('Erreur forgotPassword Win:', error);
+        res.status(500).json({ message: error.message || "Erreur lors de l'envoi de l'e-mail de réinitialisation." });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, tokenOrCode, token, code, newPassword, password } = req.body;
+        const cleanTokenOrCode = (token || tokenOrCode || code || '').trim();
+        const rawPassword = newPassword || password;
+
+        if (!cleanTokenOrCode || !rawPassword) {
+            return res.status(400).json({ message: "Le code/jeton et le nouveau mot de passe sont requis." });
+        }
+
+        if (rawPassword.length < 6) {
+            return res.status(400).json({ message: "Le mot de passe doit contenir au moins 6 caractères." });
+        }
+
+        let records = [];
+        let normalizedEmail = '';
+        if (email && typeof email === 'string' && email.trim()) {
+            normalizedEmail = email.trim().toLowerCase();
+            const [result] = await db.execute(
+                'SELECT * FROM password_resets WHERE LOWER(email) = ? AND (token = ? OR code = ?) ORDER BY id DESC LIMIT 1',
+                [normalizedEmail, cleanTokenOrCode, cleanTokenOrCode]
+            );
+            records = result;
+        } else {
+            const [result] = await db.execute(
+                'SELECT * FROM password_resets WHERE token = ? OR code = ? ORDER BY id DESC LIMIT 1',
+                [cleanTokenOrCode, cleanTokenOrCode]
+            );
+            records = result;
+        }
+
+        if (!records || records.length === 0) {
+            return res.status(400).json({ message: "Code ou lien de réinitialisation invalide." });
+        }
+
+        const resetRecord = records[0];
+        const targetEmail = (resetRecord.email || normalizedEmail || '').toLowerCase();
+
+        const expireTime = parseExpiration(resetRecord.expires_at);
+        if (isNaN(expireTime) || expireTime < Date.now()) {
+            await db.execute('DELETE FROM password_resets WHERE id = ?', [resetRecord.id]);
+            return res.status(400).json({ message: "Ce code ou lien de réinitialisation a expiré. Veuillez refaire une demande." });
+        }
+
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+        await db.execute('UPDATE users SET password_hash = ? WHERE LOWER(email) = ?', [hashedPassword, targetEmail]);
+        await db.execute('DELETE FROM password_resets WHERE LOWER(email) = ?', [targetEmail]);
+
+        res.json({ message: "Votre mot de passe a été réinitialisé avec succès ! Vous pouvez maintenant vous connecter." });
+    } catch (error) {
+        console.error('Erreur resetPassword Win:', error);
+        res.status(500).json({ message: error.message || "Erreur lors de la réinitialisation du mot de passe." });
+    }
+};
+

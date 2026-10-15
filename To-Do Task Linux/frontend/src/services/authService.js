@@ -107,5 +107,47 @@ export const authService = {
             throw new Error(error.message || 'Erreur sélection avatar')
         }
         return response.json()
+    },
+
+    async forgotPassword(email) {
+        const response = await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email }),
+            credentials: 'include'
+        })
+
+        const data = await response.json()
+        if (!response.ok) {
+            throw new Error(data.message || 'Erreur lors de la demande de réinitialisation')
+        }
+        return data
+    },
+
+    async resetPassword({ email, tokenOrCode, token, newPassword, password }) {
+        const payloadToken = token || tokenOrCode
+        const payloadPassword = newPassword || password
+        const response = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                token: payloadToken,
+                tokenOrCode: payloadToken,
+                newPassword: payloadPassword,
+                password: payloadPassword
+            }),
+            credentials: 'include'
+        })
+
+        const data = await response.json()
+        if (!response.ok) {
+            throw new Error(data.message || 'Erreur lors de la réinitialisation du mot de passe')
+        }
+        return data
     }
 }

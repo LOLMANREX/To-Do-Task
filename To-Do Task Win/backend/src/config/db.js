@@ -123,6 +123,16 @@ const ensureTables = async () => {
                 FOREIGN KEY(user_id) REFERENCES users(id)
             )
         `);
+        await execute(`
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL,
+                code TEXT NOT NULL,
+                token TEXT NOT NULL,
+                expires_at DATETIME NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
     } catch (e) {
         console.error('Erreur initialisation tables SQLite:', e);
     }
