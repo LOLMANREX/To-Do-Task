@@ -1,6 +1,8 @@
+import { apiUrl } from '../lib/api';
+
 export const authService = {
     async register({ firstName, lastName, email, password }) {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch(apiUrl('/api/auth/register'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -10,14 +12,14 @@ export const authService = {
         })
         
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Erreur lors de l\'inscription')
         }
         return response.json()
     },
 
     async login(email, password) {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch(apiUrl('/api/auth/login'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -27,14 +29,14 @@ export const authService = {
         })
 
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Identifiants incorrects')
         }
         return response.json()
     },
     
     async me() {
-        const response = await fetch('/api/auth/me', {
+        const response = await fetch(apiUrl('/api/auth/me'), {
             method: 'GET',
             credentials: 'include'
         })
@@ -46,7 +48,7 @@ export const authService = {
     },
 
     async updateProfile({ firstName, lastName }) {
-        const response = await fetch('/api/auth/profile', {
+        const response = await fetch(apiUrl('/api/auth/profile'), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,7 +58,7 @@ export const authService = {
         })
 
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Erreur mise à jour profil')
         }
         return response.json()
@@ -66,34 +68,34 @@ export const authService = {
         const formData = new FormData()
         formData.append('avatar', file)
 
-        const response = await fetch('/api/auth/avatar', {
+        const response = await fetch(apiUrl('/api/auth/avatar'), {
             method: 'POST',
             body: formData,
             credentials: 'include'
         })
 
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Erreur upload avatar')
         }
         return response.json()
     },
 
     async deleteAvatar() {
-        const response = await fetch('/api/auth/avatar', {
+        const response = await fetch(apiUrl('/api/auth/avatar'), {
             method: 'DELETE',
             credentials: 'include'
         })
 
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Erreur suppression avatar')
         }
         return response.json()
     },
 
     async setAvatarPreset(avatarUrl) {
-        const response = await fetch('/api/auth/avatar-preset', {
+        const response = await fetch(apiUrl('/api/auth/avatar-preset'), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -103,14 +105,14 @@ export const authService = {
         })
 
         if (!response.ok) {
-            const error = await response.json()
+            const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Erreur sélection avatar')
         }
         return response.json()
     },
 
     async forgotPassword(email) {
-        const response = await fetch('/api/auth/forgot-password', {
+        const response = await fetch(apiUrl('/api/auth/forgot-password'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -119,7 +121,7 @@ export const authService = {
             credentials: 'include'
         })
 
-        const data = await response.json()
+        const data = await response.json().catch(() => ({}))
         if (!response.ok) {
             throw new Error(data.message || 'Erreur lors de la demande de réinitialisation')
         }
@@ -129,7 +131,7 @@ export const authService = {
     async resetPassword({ email, tokenOrCode, token, newPassword, password }) {
         const payloadToken = token || tokenOrCode
         const payloadPassword = newPassword || password
-        const response = await fetch('/api/auth/reset-password', {
+        const response = await fetch(apiUrl('/api/auth/reset-password'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -144,7 +146,7 @@ export const authService = {
             credentials: 'include'
         })
 
-        const data = await response.json()
+        const data = await response.json().catch(() => ({}))
         if (!response.ok) {
             throw new Error(data.message || 'Erreur lors de la réinitialisation du mot de passe')
         }
